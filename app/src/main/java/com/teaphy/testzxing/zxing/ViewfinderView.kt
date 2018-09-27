@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing
+package com.teaphy.testzxing.zxing
 
 import com.google.zxing.ResultPoint
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
+import com.teaphy.testzxing.R
+import com.teaphy.testzxing.zxing.camera.CameraManager
 
-import com.teaphy.testzxing.camera.CameraManager
 import java.util.ArrayList
 
 /**

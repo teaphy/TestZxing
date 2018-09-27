@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing
+package com.teaphy.testzxing.zxing
 
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.res.AssetFileDescriptor
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Vibrator
 import android.preference.PreferenceManager
 import android.util.Log
+import com.teaphy.testzxing.R
 
 import java.io.Closeable
 import java.io.IOException
 
 /**
- * Manages beeps and vibrations for [CaptureActivity].
+ * Manages beeps and vibrations for [CaptureFragment].
  */
 internal class BeepManager(private val activity: Activity) : MediaPlayer.OnErrorListener, Closeable {
 	private var mediaPlayer: MediaPlayer? = null

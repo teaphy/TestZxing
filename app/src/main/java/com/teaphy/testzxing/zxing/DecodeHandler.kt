@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing
+package com.teaphy.testzxing.zxing
 
 import android.graphics.Bitmap
 import com.google.zxing.BinaryBitmap
@@ -29,20 +29,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.util.Log
 
-import com.teaphy.testzxing.camera.CameraManager
+import com.teaphy.testzxing.R
 import java.io.ByteArrayOutputStream
 
-/**
- * 解码Handler
- */
-internal class DecodeHandler(hints: Map<DecodeHintType, Any>, private val mAnalysisCallback: IBarcodeAnalysisCallback,
-                             private val cameraManager: CameraManager) : Handler() {
-	private val multiFormatReader: MultiFormatReader
+internal class DecodeHandler(private val activity: CaptureFragment, hints: Map<DecodeHintType, Any>) : Handler() {
+	private val multiFormatReader: MultiFormatReader = MultiFormatReader()
 	private var running = true
 
 	init {
-		multiFormatReader = MultiFormatReader()
 		multiFormatReader.setHints(hints)
 	}
 
@@ -61,30 +57,29 @@ internal class DecodeHandler(hints: Map<DecodeHintType, Any>, private val mAnaly
 
 	/**
 	 * Decode the data within the viewfinder rectangle, and time how long it took. For efficiency,
-	 * reuse the same reader objects from one decode to the next. 解码取景器矩形内的数据，并计算所需的时间。
-	 * 为了提高效率，从一个解码到下一个解码重用相同的读取器对象。
+	 * reuse the same reader objects from one decode to the next.
 	 *
-	 * @param data The YUV preview frame.
-	 * @param width The width of the preview frame.
+	 * @param data   The YUV preview frame.
+	 * @param width  The width of the preview frame.
 	 * @param height The height of the preview frame.
 	 */
 	private fun decode(data: ByteArray, width: Int, height: Int) {
-		var data = data
 		val start = System.currentTimeMillis()
+		var rotatedData = ByteArray(data.size)
 
-		if (width < height) {
-			// portrait
-			val rotatedData = ByteArray(data.size)
+		if (width < height) { // portrait
+
 			for (x in 0 until width) {
 				for (y in 0 until height) {
 					rotatedData[y * width + width - x - 1] = data[y + x * height]
 				}
 			}
-			data = rotatedData
+		} else {
+			rotatedData = data
 		}
 
 		var rawResult: Result? = null
-		val source = cameraManager.buildLuminanceSource(data, width, height)
+		val source = activity.cameraManager!!.buildLuminanceSource(rotatedData, width, height)
 		if (source != null) {
 			val bitmap = BinaryBitmap(HybridBinarizer(source))
 			try {
@@ -96,15 +91,24 @@ internal class DecodeHandler(hints: Map<DecodeHintType, Any>, private val mAnaly
 			}
 		}
 
-		if (null != rawResult) {
-			val bundle = Bundle()
-			bundleThumbnail(source!!, bundle)
-			mAnalysisCallback.onAnalysisSuccess(rawResult, bundle)
-			cameraManager.requestPreviewFrame(this, R.id.decode)
+		val handler = activity.getHandler()
+		if (rawResult != null) {
+			// Don't log the barcode contents for security.
+			val end = System.currentTimeMillis()
+			Log.d(TAG, "Found barcode in " + (end - start) + " ms")
+			if (handler != null) {
+				val message = Message.obtain(handler, R.id.decode_succeeded, rawResult)
+				val bundle = Bundle()
+				bundleThumbnail(source!!, bundle)
+				message.data = bundle
+				message.sendToTarget()
+			}
 		} else {
-			mAnalysisCallback.onAnalysisFailure()
+			if (handler != null) {
+				val message = Message.obtain(handler, R.id.decode_failed)
+				message.sendToTarget()
+			}
 		}
-
 	}
 
 	companion object {
@@ -115,8 +119,7 @@ internal class DecodeHandler(hints: Map<DecodeHintType, Any>, private val mAnaly
 			val pixels = source.renderThumbnail()
 			val width = source.thumbnailWidth
 			val height = source.thumbnailHeight
-			val bitmap = Bitmap
-					.createBitmap(pixels, 0, width, width, height, Bitmap.Config.ARGB_8888)
+			val bitmap = Bitmap.createBitmap(pixels, 0, width, width, height, Bitmap.Config.ARGB_8888)
 			val out = ByteArrayOutputStream()
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out)
 			bundle.putByteArray(DecodeThread.BARCODE_BITMAP, out.toByteArray())

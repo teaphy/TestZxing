@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing.camera
+package com.teaphy.testzxing.zxing.camera
 
 import android.content.SharedPreferences
-import com.teaphy.testzxing.ZxingKeyConstant
+import com.teaphy.testzxing.zxing.ZxingKeyConstant
 
 /**
  * Enumerates settings of the preference controlling the front light.

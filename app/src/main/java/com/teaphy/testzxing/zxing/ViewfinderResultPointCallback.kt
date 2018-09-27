@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing
+package com.teaphy.testzxing.zxing
 
 import com.google.zxing.ResultPoint
 import com.google.zxing.ResultPointCallback

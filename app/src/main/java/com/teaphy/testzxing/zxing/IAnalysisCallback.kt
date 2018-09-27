@@ -1,5 +1,6 @@
-package com.teaphy.testzxing
+package com.teaphy.testzxing.zxing
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import com.google.zxing.Result
 
@@ -8,9 +9,9 @@ import com.google.zxing.Result
  * @author tiany
  * @time 2018/9/4 下午2:28
  */
-interface IBarcodeAnalysisCallback {
+interface IAnalysisCallback {
 
-	fun onAnalysisSuccess(rawResult: Result, bundle: Bundle)
+	fun onAnalysisSuccess(rawResult: Result, barcode: Bitmap?)
 
 	fun onAnalysisFailure()
 }

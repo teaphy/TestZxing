@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing.camera
+package com.teaphy.testzxing.zxing.camera
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Point
 import android.graphics.Rect
@@ -24,9 +25,9 @@ import android.os.Handler
 import android.util.Log
 import android.view.SurfaceHolder
 import com.google.zxing.PlanarYUVLuminanceSource
+import com.teaphy.testzxing.zxing.camera.open.OpenCamera
+import com.teaphy.testzxing.zxing.camera.open.OpenCameraInterface
 
-import com.teaphy.testzxing.camera.open.OpenCamera
-import com.teaphy.testzxing.camera.open.OpenCameraInterface
 import java.io.IOException
 
 /**
@@ -34,33 +35,25 @@ import java.io.IOException
  * implementation encapsulates the steps needed to take preview-sized images, which are used for
  * both preview and decoding.
  *
- * 此对象包裹Camera服务对象，并作为它的唯一对话对象。 该实现封装了拍摄预览-大小图像所需的步骤，这些图像用于预览和解码。
- *
  * @author dswitkin@google.com (Daniel Switkin)
  */
 // camera APIs
-class CameraManager(private val context: Context) {
+class CameraManager private constructor(private val context: Context) {
 	private val configManager: CameraConfigurationManager = CameraConfigurationManager(context)
-	private var camera: OpenCamera? = null
+	var camera: OpenCamera? = null
 	private var autoFocusManager: AutoFocusManager? = null
-	// 该目标有助于对齐并迫使用户将设备保持足够远以确保图像将聚焦。
 	var framingRect: Rect? = null
 		get() {
 			if (field == null) {
 				if (camera == null) {
 					return null
 				}
-
-				// 获取屏幕尺寸
 				val screenResolution = configManager.screenResolution
 					?: // Called early, before init even finished
 					return null
 
-				// 放大预览框
-				val width = findDesiredDimensionInRange(screenResolution.x, MIN_FRAME_WIDTH,
-						MAX_FRAME_WIDTH)
-				val height = findDesiredDimensionInRange(screenResolution.y, MIN_FRAME_HEIGHT,
-						MAX_FRAME_HEIGHT)
+				val width = findDesiredDimensionInRange(screenResolution.x, MIN_FRAME_WIDTH, MAX_FRAME_WIDTH)
+				val height = findDesiredDimensionInRange(screenResolution.y, MIN_FRAME_HEIGHT, MAX_FRAME_HEIGHT)
 
 				val leftOffset = (screenResolution.x - width) / 2
 				val topOffset = (screenResolution.y - height) / 2
@@ -69,11 +62,9 @@ class CameraManager(private val context: Context) {
 			}
 			return field
 		}
-
-	// 坐标是预览框架，而不是UI/屏幕。
 	var framingRectInPreview: Rect? = null
 		get() {
-			if (field == null) {
+			if (field== null) {
 				val framingRect = framingRect ?: return null
 				val rect = Rect(framingRect)
 				val cameraResolution = configManager.cameraResolution
@@ -83,29 +74,26 @@ class CameraManager(private val context: Context) {
 					return null
 				}
 
+
 				if (screenResolution.x < screenResolution.y) {
-					// portrait
+					// 下面为竖屏模式
 					rect.left = rect.left * cameraResolution.y / screenResolution.x
 					rect.right = rect.right * cameraResolution.y / screenResolution.x
 					rect.top = rect.top * cameraResolution.x / screenResolution.y
 					rect.bottom = rect.bottom * cameraResolution.x / screenResolution.y
 				} else {
-					// landscape
+					// 下面为横屏模式
 					rect.left = rect.left * cameraResolution.x / screenResolution.x
 					rect.right = rect.right * cameraResolution.x / screenResolution.x
 					rect.top = rect.top * cameraResolution.y / screenResolution.y
 					rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y
 				}
-				//
-				//			rect.left = rect.left * cameraResolution.x / screenResolution.x;
-				//			rect.right = rect.right * cameraResolution.x / screenResolution.x;
-				//			rect.top = rect.top * cameraResolution.y / screenResolution.y;
-				//			rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;
+
+
 				field = rect
 			}
 			return field
 		}
-
 	private var initialized: Boolean = false
 	private var previewing: Boolean = false
 	private var requestedCameraId = OpenCameraInterface.NO_REQUESTED_CAMERA
@@ -113,7 +101,7 @@ class CameraManager(private val context: Context) {
 	private var requestedFramingRectHeight: Int = 0
 	/**
 	 * Preview frames are delivered here, which we pass on to the registered handler. Make sure to
-	 * clear the handler so it will only receive one message. 预览图回调，将其传递给注册的监听
+	 * clear the handler so it will only receive one message.
 	 */
 	private val previewCallback: PreviewCallback
 
@@ -144,7 +132,7 @@ class CameraManager(private val context: Context) {
 
 		if (!initialized) {
 			initialized = true
-			configManager.initFromCameraParameters(theCamera)
+			configManager.initFromCameraParameters(theCamera!!)
 			if (requestedFramingRectWidth > 0 && requestedFramingRectHeight > 0) {
 				setManualFramingRect(requestedFramingRectWidth, requestedFramingRectHeight)
 				requestedFramingRectWidth = 0
@@ -153,7 +141,7 @@ class CameraManager(private val context: Context) {
 		}
 
 		val cameraObject = theCamera.camera
-		var parameters: Camera.Parameters? = cameraObject.parameters
+		var parameters: Camera.Parameters? = cameraObject.getParameters()
 		val parametersFlattened = parameters?.flatten() // Save these, temporarily
 		try {
 			configManager.setDesiredCameraParameters(theCamera, false)
@@ -162,16 +150,18 @@ class CameraManager(private val context: Context) {
 			Log.w(TAG, "Camera rejected parameters. Setting only minimal safe-mode parameters")
 			Log.i(TAG, "Resetting to saved camera params: " + parametersFlattened!!)
 			// Reset:
-			parameters = cameraObject.parameters
-			parameters!!.unflatten(parametersFlattened)
-			try {
-				cameraObject.parameters = parameters
-				configManager.setDesiredCameraParameters(theCamera, true)
-			} catch (re2: RuntimeException) {
-				// Well, darn. Give up
-				Log.w(TAG, "Camera rejected even safe-mode parameters! No configuration")
-			}
+			if (parametersFlattened != null) {
+				parameters = cameraObject.getParameters()
+				parameters!!.unflatten(parametersFlattened)
+				try {
+					cameraObject.setParameters(parameters)
+					configManager.setDesiredCameraParameters(theCamera!!, true)
+				} catch (re2: RuntimeException) {
+					// Well, darn. Give up
+					Log.w(TAG, "Camera rejected even safe-mode parameters! No configuration")
+				}
 
+			}
 		}
 
 		cameraObject.setPreviewDisplay(holder)
@@ -202,7 +192,7 @@ class CameraManager(private val context: Context) {
 		if (theCamera != null && !previewing) {
 			theCamera.camera.startPreview()
 			previewing = true
-			autoFocusManager = AutoFocusManager(context, theCamera.camera, true)
+			autoFocusManager = AutoFocusManager(context, theCamera.camera,true)
 		}
 	}
 
@@ -223,10 +213,9 @@ class CameraManager(private val context: Context) {
 	}
 
 	/**
-	 * 设置是否打开闪光灯
+	 * Convenience method for [com.google.zxing.client.android.CaptureActivity]
 	 *
-	 * @param newSetting if `true`, light should be turned on if currently off. And vice
-	 * versa.
+	 * @param newSetting if `true`, light should be turned on if currently off. And vice versa.
 	 */
 	@Synchronized
 	fun setTorch(newSetting: Boolean) {
@@ -246,11 +235,9 @@ class CameraManager(private val context: Context) {
 	}
 
 	/**
-	 * A single preview frame will be returned to the handler supplied. The data will arrive as
-	 * byte[] in the message.obj field, with width and height encoded as message.arg1 and
-	 * message.arg2, respectively.
-	 *
-	 * 单个预览框将返回到提供的处理程序。 数据将以byte []的形式到达message.obj字段， 宽度和高度分别编码为message.arg1和message.arg2。
+	 * A single preview frame will be returned to the handler supplied. The data will arrive as byte[]
+	 * in the message.obj field, with width and height encoded as message.arg1 and message.arg2,
+	 * respectively.
 	 *
 	 * @param handler The handler to send the message to.
 	 * @param message The what field of the message to be sent.
@@ -266,20 +253,35 @@ class CameraManager(private val context: Context) {
 
 	/**
 	 * Calculates the framing rect which the UI should draw to show the user where to place the
-	 * barcode. This target helps with alignment as well as forces the user to hold the device far
-	 * enough away to ensure the image will be in focus. 计算UI应绘制的框架矩形，以向用户显示条形码的放置位置。
-	 * 该目标有助于对齐并迫使用户将设备保持足够远以确保图像将聚焦。
+	 * barcode. This target helps with alignment as well as forces the user to hold the device
+	 * far enough away to ensure the image will be in focus.
 	 *
 	 * @return The rectangle to draw on screen in window coordinates.
 	 */
 //	@Synchronized
 //	fun getFramingRect(): Rect? {
+//		if (framingRect == null) {
+//			if (camera == null) {
+//				return null
+//			}
+//			val screenResolution = configManager.screenResolution
+//				?: // Called early, before init even finished
+//				return null
 //
+//			val width = findDesiredDimensionInRange(screenResolution.x, MIN_FRAME_WIDTH, MAX_FRAME_WIDTH)
+//			val height = findDesiredDimensionInRange(screenResolution.y, MIN_FRAME_HEIGHT, MAX_FRAME_HEIGHT)
+//
+//			val leftOffset = (screenResolution.x - width) / 2
+//			val topOffset = (screenResolution.y - height) / 2
+//			framingRect = Rect(leftOffset, topOffset, leftOffset + width, topOffset + height)
+//			Log.d(TAG, "Calculated framing rect: " + framingRect!!)
+//		}
+//		return framingRect
 //	}
 
 	/**
-	 * Like [.getFramingRect] but coordinates are in terms of the preview frame, not UI /
-	 * screen. 坐标是预览框架，而不是UI/屏幕。
+	 * Like [.getFramingRect] but coordinates are in terms of the preview frame,
+	 * not UI / screen.
 	 *
 	 * @return [Rect] expressing barcode scan area in terms of the preview size
 	 */
@@ -294,33 +296,19 @@ class CameraManager(private val context: Context) {
 //				// Called early, before init even finished
 //				return null
 //			}
-//
-//			if (screenResolution.x < screenResolution.y) {
-//				// portrait
-//				rect.left = rect.left * cameraResolution.y / screenResolution.x
-//				rect.right = rect.right * cameraResolution.y / screenResolution.x
-//				rect.top = rect.top * cameraResolution.x / screenResolution.y
-//				rect.bottom = rect.bottom * cameraResolution.x / screenResolution.y
-//			} else {
-//				// landscape
-//				rect.left = rect.left * cameraResolution.x / screenResolution.x
-//				rect.right = rect.right * cameraResolution.x / screenResolution.x
-//				rect.top = rect.top * cameraResolution.y / screenResolution.y
-//				rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y
-//			}
-//			//
-//			//			rect.left = rect.left * cameraResolution.x / screenResolution.x;
-//			//			rect.right = rect.right * cameraResolution.x / screenResolution.x;
-//			//			rect.top = rect.top * cameraResolution.y / screenResolution.y;
-//			//			rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;
+//			rect.left = rect.left * cameraResolution.x / screenResolution.x
+//			rect.right = rect.right * cameraResolution.x / screenResolution.x
+//			rect.top = rect.top * cameraResolution.y / screenResolution.y
+//			rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y
 //			framingRectInPreview = rect
 //		}
 //		return framingRectInPreview
 //	}
 
+
 	/**
-	 * Allows third party apps to specify the camera ID, rather than determine it automatically
-	 * based on available cameras and their orientation. 允许第三方应用指定相机ID，而不是根据可用的相机及其方向自动确定。
+	 * Allows third party apps to specify the camera ID, rather than determine
+	 * it automatically based on available cameras and their orientation.
 	 *
 	 * @param cameraId camera ID of the camera to use. A negative value means "no preference".
 	 */
@@ -332,8 +320,6 @@ class CameraManager(private val context: Context) {
 	/**
 	 * Allows third party apps to specify the scanning rectangle dimensions, rather than determine
 	 * them automatically based on screen resolution.
-	 *
-	 * 允许第三方应用指定扫描矩形尺寸，而不是根据屏幕分辨率自动确定
 	 *
 	 * @param width The width in pixels to scan.
 	 * @param height The height in pixels to scan.
@@ -352,8 +338,7 @@ class CameraManager(private val context: Context) {
 			}
 			val leftOffset = (screenResolution.x - width) / 2
 			val topOffset = (screenResolution.y - height) / 2
-			framingRect = Rect(leftOffset, topOffset, leftOffset + width,
-					topOffset + height)
+			framingRect = Rect(leftOffset, topOffset, leftOffset + width, topOffset + height)
 			Log.d(TAG, "Calculated manual framing rect: " + framingRect!!)
 			framingRectInPreview = null
 		} else {
@@ -363,28 +348,38 @@ class CameraManager(private val context: Context) {
 	}
 
 	/**
-	 * A factory method to build the appropriate LuminanceSource object based on the format of the
-	 * preview buffers, as described by Camera.Parameters.
-	 *
-	 * 一种工厂方法，用于根据预览缓冲区的格式构建适当的LuminanceSource对象，如Camera.Parameters所述。
+	 * A factory method to build the appropriate LuminanceSource object based on the format
+	 * of the preview buffers, as described by Camera.Parameters.
 	 *
 	 * @param data A preview frame.
-	 * @param width The width of the image. 预览图的宽度
-	 * @param height The height of the image. 预览图的高度
+	 * @param width The width of the image.
+	 * @param height The height of the image.
 	 * @return A PlanarYUVLuminanceSource instance.
 	 */
 	fun buildLuminanceSource(data: ByteArray, width: Int, height: Int): PlanarYUVLuminanceSource? {
-
-		// 获取条码扫描举行区域
 		val rect = framingRectInPreview ?: return null
 // Go ahead and assume it's YUV rather than die.
-		// 此对象围绕从相机驱动程序返回的YUV数据数组扩展LuminanceSource，
-		// 并可选择裁剪为完整数据中的矩形。 这可以用于排除周边的多余像素并加速解码。
 		return PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
 				rect.width(), rect.height(), false)
 	}
 
 	companion object {
+
+		@SuppressLint("StaticFieldLeak")
+		private var INSTANCE: CameraManager? = null
+
+		@Synchronized
+		fun obtain(context: Context) : CameraManager{
+			@Synchronized if (null == INSTANCE) {
+				INSTANCE = CameraManager(context)
+			}
+
+			return INSTANCE!!
+		}
+
+		fun getInstance() : CameraManager {
+			return INSTANCE ?: throw Throwable("CameraManager isn't init")
+		}
 
 		private val TAG = CameraManager::class.java.simpleName
 
@@ -393,9 +388,7 @@ class CameraManager(private val context: Context) {
 		private val MAX_FRAME_WIDTH = 1200 // = 5/8 * 1920
 		private val MAX_FRAME_HEIGHT = 675 // = 5/8 * 1080
 
-
 		private fun findDesiredDimensionInRange(resolution: Int, hardMin: Int, hardMax: Int): Int {
-			// 每个维度的 5/8
 			val dim = 5 * resolution / 8 // Target 5/8 of each dimension
 			if (dim < hardMin) {
 				return hardMin

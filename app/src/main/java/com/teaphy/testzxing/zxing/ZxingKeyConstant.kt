@@ -1,4 +1,4 @@
-package com.teaphy.testzxing
+package com.teaphy.testzxing.zxing
 
 class ZxingKeyConstant {
 	companion object {

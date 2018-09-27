@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing
+package com.teaphy.testzxing.zxing
 
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -23,6 +23,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.AsyncTask
 import android.os.BatteryManager
+import android.support.v4.app.FragmentActivity
 import android.util.Log
 
 import java.util.concurrent.RejectedExecutionException
@@ -30,7 +31,7 @@ import java.util.concurrent.RejectedExecutionException
 /**
  * Finishes an activity after a period of inactivity if the device is on battery power.
  */
-internal class InactivityTimer(private val activity: Activity) {
+internal class InactivityTimer(private val activity:FragmentActivity) {
 	private val powerStatusReceiver: BroadcastReceiver
 	private var registered: Boolean = false
 	private var inactivityTask: AsyncTask<Any, Any, Any>? = null

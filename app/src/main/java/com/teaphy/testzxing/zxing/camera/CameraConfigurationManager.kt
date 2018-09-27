@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing.camera
+package com.teaphy.testzxing.zxing.camera
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -22,19 +22,19 @@ import android.graphics.Point
 import android.hardware.Camera
 import android.preference.PreferenceManager
 import android.util.Log
-import android.view.Display
 import android.view.Surface
 import android.view.WindowManager
 
 import com.google.zxing.client.android.camera.CameraConfigurationUtils
-import com.teaphy.testzxing.camera.open.CameraFacing
-import com.teaphy.testzxing.camera.open.OpenCamera
+import com.teaphy.testzxing.zxing.camera.open.CameraFacing
+import com.teaphy.testzxing.zxing.camera.open.OpenCamera
+import java.lang.reflect.Method
 
 /**
  * A class which deals with reading, parsing, and setting the camera parameters which are used to
  * configure the camera hardware. 用于处理读取，解析和设置用于配置相机硬件的相机参数的类。
  */
-internal// camera APIs
+internal open// camera APIs
 class CameraConfigurationManager(private val context: Context) {
 	var cwNeededRotation: Int = 0
 		private set
@@ -112,8 +112,20 @@ class CameraConfigurationManager(private val context: Context) {
 		display.getSize(theScreenResolution)
 		screenResolution = theScreenResolution
 		Log.i(TAG, "Screen resolution in current orientation: " + screenResolution!!)
+
+		//为竖屏添加
+		val screenResolutionForCamera = Point()
+		screenResolutionForCamera.x = screenResolution!!.x
+		screenResolutionForCamera.y = screenResolution!!.y
+		if (screenResolution!!.x < screenResolution!!.y) {
+			screenResolutionForCamera.x = screenResolution!!.y
+			screenResolutionForCamera.y = screenResolution!!.x
+		}
+		// 下句第二参数要根据竖屏修改
 		cameraResolution = CameraConfigurationUtils
-				.findBestPreviewSizeValue(parameters, screenResolution)
+				.findBestPreviewSizeValue(parameters, screenResolutionForCamera)
+
+
 		Log.i(TAG, "Camera resolution: " + cameraResolution!!)
 		bestPreviewSize = CameraConfigurationUtils
 				.findBestPreviewSizeValue(parameters, screenResolution)
@@ -133,18 +145,12 @@ class CameraConfigurationManager(private val context: Context) {
 	fun setDesiredCameraParameters(camera: OpenCamera, safeMode: Boolean) {
 
 		val theCamera = camera.camera
-		val parameters = theCamera.parameters
+		val parameters = theCamera.parameters ?: return
 
-		if (parameters == null) {
-			Log.w(TAG,
-					"Device error: no camera parameters are available. Proceeding without configuration.")
-			return
-		}
-
-		Log.i(TAG, "Initial camera parameters: " + parameters.flatten())
+		// 使摄像头旋转90度
+		setDisplayOrientation(theCamera, 90)
 
 		if (safeMode) {
-			Log.w(TAG, "In camera config safe mode -- most settings will not be honored")
 		}
 
 		val prefs = PreferenceManager.getDefaultSharedPreferences(context)
@@ -187,12 +193,19 @@ class CameraConfigurationManager(private val context: Context) {
 		val afterParameters = theCamera.parameters
 		val afterSize = afterParameters.previewSize
 		if (afterSize != null && (bestPreviewSize!!.x != afterSize.width || bestPreviewSize!!.y != afterSize.height)) {
-			Log.w(TAG, "Camera said it supported preview size " + bestPreviewSize!!.x + 'x'.toString()
-					+ bestPreviewSize!!.y +
-					", but after setting it, preview size is " + afterSize.width + 'x'.toString()
-					+ afterSize.height)
 			bestPreviewSize!!.x = afterSize.width
 			bestPreviewSize!!.y = afterSize.height
+		}
+	}
+
+	fun setDisplayOrientation(camera: Camera, angle: Int) {
+		var  downPolymorphic: Method? = null
+
+		try {
+			downPolymorphic = camera.javaClass.getMethod("setDisplayOrientation", Int::class.java)
+			downPolymorphic?.invoke(camera, angle);
+		} catch (e: Exception) {
+			e.printStackTrace();
 		}
 	}
 

@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing
+package com.teaphy.testzxing.zxing
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.preference.PreferenceManager
-import com.teaphy.testzxing.camera.CameraManager
-import com.teaphy.testzxing.camera.FrontLightMode
+import com.teaphy.testzxing.zxing.camera.CameraManager
 
 /**
  * Detects ambient light and switches on the front light when very dark, and off again when sufficiently light.

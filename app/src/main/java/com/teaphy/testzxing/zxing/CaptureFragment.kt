@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing
+package com.teaphy.testzxing.zxing
 
-import android.app.Activity
+import com.google.zxing.Result
+import com.google.zxing.ResultPoint
+
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
+import android.support.v4.app.Fragment
 import android.util.Log
-import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.Window
-import android.view.WindowManager
-import android.widget.Toast
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.DecodeHintType
-import com.google.zxing.Result
-import com.google.zxing.ResultMetadataType
-import com.teaphy.testzxing.camera.CameraManager
+import android.view.*
+import com.teaphy.testzxing.R
+import com.teaphy.testzxing.zxing.camera.CameraManager
+
 import java.io.IOException
-import java.util.EnumSet
 
 /**
  * This activity opens the camera and does the actual scanning on a background thread. It draws a
@@ -43,39 +41,52 @@ import java.util.EnumSet
  * @author dswitkin@google.com (Daniel Switkin)
  * @author Sean Owen
  */
-class CaptureActivity : Activity(), SurfaceHolder.Callback, IBarcodeAnalysisCallback {
+class CaptureFragment : Fragment(), SurfaceHolder.Callback {
 
-	internal var cameraManager: CameraManager? = null
-		private set
+	var cameraManager: CameraManager? = null
+	private var handler: CaptureActivityHandler? = null
 	internal var viewfinderView: ViewfinderView? = null
 		private set
 	private var hasSurface: Boolean = false
 	private var inactivityTimer: InactivityTimer? = null
-	// 管理响铃和震动
 	private var beepManager: BeepManager? = null
-	// 亮度低时，是否自动打开闪光灯
 	private var ambientLightManager: AmbientLightManager? = null
 
-	private var mDecodeThread: DecodeThread? = null
+	lateinit var rootView: View
+
+	var barcodeCallback: IAnalysisCallback? = null
+
+	fun getHandler(): Handler? {
+		return handler
+	}
 
 	public override fun onCreate(icicle: Bundle?) {
 		super.onCreate(icicle)
 
-		// 设置 保持屏幕常亮
-		val window = window
-		window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-		setContentView(R.layout.capture)
-
 		hasSurface = false
+		inactivityTimer = InactivityTimer(activity!!)
+		beepManager = BeepManager(activity!!)
+		ambientLightManager = AmbientLightManager(activity!!)
 
-		// 管理Activity
-		// 当设备使用电池时，若一段时间内没有交互，关闭当前Activity
-		inactivityTimer = InactivityTimer(this)
-		// 管理响铃和震动
-		beepManager = BeepManager(this)
-		// 亮度低时，是否自动打开闪光灯
-		ambientLightManager = AmbientLightManager(this)
+		PreferenceManager.setDefaultValues(activity, R.xml.preferences, false)
+	}
 
+	override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+		val bundle = arguments
+		var layoutId = -1
+		if (bundle != null) {
+			layoutId = bundle.getInt(CodeUtils.LAYOUT_ID)
+
+		}
+
+		rootView = if (layoutId != -1) {
+			inflater.inflate(layoutId, container, false)
+		} else {
+			inflater.inflate(R.layout.fragment_capture, container, false)
+		}
+
+		return rootView
 	}
 
 	override fun onResume() {
@@ -83,36 +94,36 @@ class CaptureActivity : Activity(), SurfaceHolder.Callback, IBarcodeAnalysisCall
 
 		// 在onResume中初始化 CameraManager，而不能在onCreate中
 		// 在首次启动时，并不是打开驱动程序并测量屏幕尺寸而是显示帮助
-		cameraManager = CameraManager(application)
+		cameraManager = CameraManager.obtain(activity!!)
 
 		// 获取取景器矩形，并设置CameraManager
-		viewfinderView = findViewById(R.id.viewfinder_view)
+		viewfinderView = rootView.findViewById(R.id.viewFinderView) as ViewfinderView
 		viewfinderView!!.setCameraManager(cameraManager!!)
+
+		handler = null
 
 		beepManager!!.updatePrefs()
 		ambientLightManager!!.start(cameraManager!!)
 
 		inactivityTimer!!.onResume()
 
-		val surfaceView = findViewById<SurfaceView>(R.id.preview_view)
+
+		val surfaceView = rootView.findViewById(R.id.previewView) as SurfaceView
 		val surfaceHolder = surfaceView.holder
 		if (hasSurface) {
-			// The activity was paused but not stopped, so the surface still exists. Therefore
-			// surfaceCreated() won't be called, so init the camera here.
 			// 在Activity经过Pause，但未进入stopped时， SurfaceView始终存在
 			// 故而在这里初始化Camera
 			initCamera(surfaceHolder)
 		} else {
-			// Install the callback and wait for surfaceCreated() to init the camera.
 			// 当surfaceView不存在时，添加监听回调，以便初始化Camera
 			surfaceHolder.addCallback(this)
 		}
 	}
 
 	override fun onPause() {
-		if (mDecodeThread != null) {
-			mDecodeThread!!.quitSynchronously()
-			mDecodeThread = null
+		if (handler != null) {
+			handler!!.quitSynchronously()
+			handler = null
 		}
 		inactivityTimer!!.onPause()
 		ambientLightManager!!.stop()
@@ -120,7 +131,7 @@ class CaptureActivity : Activity(), SurfaceHolder.Callback, IBarcodeAnalysisCall
 		cameraManager!!.closeDriver()
 		//historyManager = null; // Keep for onActivityResult
 		if (!hasSurface) {
-			val surfaceView = findViewById<SurfaceView>(R.id.preview_view)
+			val surfaceView = rootView.findViewById(R.id.previewView) as SurfaceView
 			val surfaceHolder = surfaceView.holder
 			surfaceHolder.removeCallback(this)
 		}
@@ -132,17 +143,21 @@ class CaptureActivity : Activity(), SurfaceHolder.Callback, IBarcodeAnalysisCall
 		super.onDestroy()
 	}
 
+	public fun openTorch() {
+		cameraManager!!.setTorch(true)
+	}
 
-	/**
-	 * SurfaceView回调
-	 */
+	fun closeTorch() {
+		cameraManager!!.setTorch(false)
+	}
+
+
 	override fun surfaceCreated(holder: SurfaceHolder?) {
 		if (holder == null) {
 			Log.e(TAG, "*** WARNING *** surfaceCreated() gave us a null surface!")
 		}
 		if (!hasSurface) {
 			hasSurface = true
-			// 初始化Camera
 			initCamera(holder)
 		}
 	}
@@ -158,18 +173,27 @@ class CaptureActivity : Activity(), SurfaceHolder.Callback, IBarcodeAnalysisCall
 	/**
 	 * 扫描结果回调 一个有效的条形码已经知道，给出一个成功的提示并显示结果
 	 */
-	fun handleDecode(rawResult: Result, barcode: Bitmap, scaleFactor: Float) {
+	fun handleDecode(rawResult: Result, barcode: Bitmap?, scaleFactor: Float) {
 		inactivityTimer!!.onActivity()
-		Toast.makeText(this, rawResult.toString(), Toast.LENGTH_SHORT).show()
 
+		barcodeCallback?.onAnalysisSuccess(rawResult, barcode)
+
+		restartPreviewAfterDelay(500)
 	}
 
+	/**
+	 * 扫描失败
+	 */
+	fun handleScanFail() {
+		barcodeCallback?.onAnalysisFailure()
+
+		restartPreviewAfterDelay(500)
+	}
 
 	/**
 	 * 初始化Camera
 	 */
 	private fun initCamera(surfaceHolder: SurfaceHolder?) {
-
 		if (surfaceHolder == null) {
 			throw IllegalStateException("No SurfaceHolder provided")
 		}
@@ -179,22 +203,11 @@ class CaptureActivity : Activity(), SurfaceHolder.Callback, IBarcodeAnalysisCall
 		}
 		try {
 			cameraManager!!.openDriver(surfaceHolder)
-
-			if (mDecodeThread == null) {
-				mDecodeThread = DecodeThread(
-						ViewfinderResultPointCallback(viewfinderView!!),
-						this, cameraManager!!)
-				mDecodeThread!!.start()
+			// Creating the handler starts the preview, which can also throw a RuntimeException.
+			if (handler == null) {
+				handler = CaptureActivityHandler(this, cameraManager!!)
 			}
-
-			cameraManager!!.startPreview()
-			restartPreviewAndDecode()
-
-			//  Creating the handler starts the preview, which can also throw a RuntimeException.
-			//			if (handler == null) {
-			//				// 初始化Handler
-			//				handler = new CaptureActivityHandler(this, cameraManager);
-			//			}
+//			decodeOrStoreSavedBitmap(null, null)
 		} catch (ioe: IOException) {
 			Log.w(TAG, ioe)
 		} catch (e: RuntimeException) {
@@ -205,36 +218,29 @@ class CaptureActivity : Activity(), SurfaceHolder.Callback, IBarcodeAnalysisCall
 
 	}
 
-	/**
-	 * 重置Preview并解码
-	 */
-	fun restartPreviewAfterDelay(delayMS: Long) {
-		restartPreviewAndDecode()
-	}
 
+	fun restartPreviewAfterDelay(delayMS: Long) {
+		if (handler != null) {
+			handler!!.sendEmptyMessageDelayed(R.id.restart_preview, delayMS)
+		}
+	}
 
 	fun drawViewfinder() {
 		viewfinderView!!.drawViewfinder()
 	}
 
-	override fun onAnalysisSuccess(rawResult: Result, bundle: Bundle) {
-		Toast.makeText(this, rawResult.toString(), Toast.LENGTH_SHORT).show()
-	}
-
-	/**
-	 * 重置Preview并解码
-	 */
-	private fun restartPreviewAndDecode() {
-		cameraManager!!.requestPreviewFrame(mDecodeThread!!.handler!!, R.id.decode)
-		drawViewfinder()
-	}
-
-	override fun onAnalysisFailure() {
-		restartPreviewAndDecode()
-	}
-
 	companion object {
 
-		private val TAG = CaptureActivity::class.java.simpleName
+		private val TAG = CaptureFragment::class.java.simpleName
+
+		private fun drawLine(canvas: Canvas, paint: Paint, a: ResultPoint?, b: ResultPoint?, scaleFactor: Float) {
+			if (a != null && b != null) {
+				canvas.drawLine(scaleFactor * a.x,
+						scaleFactor * a.y,
+						scaleFactor * b.x,
+						scaleFactor * b.y,
+						paint)
+			}
+		}
 	}
 }

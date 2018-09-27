@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.teaphy.testzxing.camera
+package com.teaphy.testzxing.zxing.camera
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.hardware.Camera
 import android.os.AsyncTask
 import android.preference.PreferenceManager
@@ -126,7 +125,7 @@ class AutoFocusManager(context: Context, private val camera: Camera, // 是否�
 
 		private val TAG = AutoFocusManager::class.java.simpleName
 
-		private val AUTO_FOCUS_INTERVAL_MS = 2000L
+		private val AUTO_FOCUS_INTERVAL_MS = 1200L
 		private val FOCUS_MODES_CALLING_AF: MutableCollection<String>
 
 		init {
