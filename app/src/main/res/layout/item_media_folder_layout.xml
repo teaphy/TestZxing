@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content">
+
+	<ImageView
+		android:id="@+id/image"
+		android:layout_width="64dp"
+		android:layout_height="64dp"
+		android:layout_marginStart="10dp"
+		android:layout_marginTop="10dp"
+		android:layout_marginBottom="10dp"
+		android:scaleType="centerCrop"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"/>
+
+	<ImageView
+		android:id="@+id/imageRight"
+		android:layout_width="18dp"
+		android:layout_height="18dp"
+		android:layout_marginEnd="10dp"
+		android:src="@mipmap/ic_right"
+		android:scaleType="centerCrop"
+		app:layout_constraintBottom_toBottomOf="@+id/image"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toTopOf="@+id/image"/>
+
+	<TextView
+		android:id="@+id/folderText"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:text="@string/folder_with_media_num"
+		android:textColor="#333333"
+		android:textSize="14sp"
+		android:lines="1"
+		android:ellipsize="end"
+		android:layout_marginStart="6dp"
+		android:layout_marginEnd="6dp"
+		app:layout_constraintBottom_toBottomOf="@+id/image"
+		app:layout_constraintEnd_toStartOf="@+id/imageRight"
+		app:layout_constraintHorizontal_bias="0.0"
+		app:layout_constraintStart_toEndOf="@+id/image"
+		app:layout_constraintTop_toTopOf="@+id/image"/>
+
+	<View
+		android:layout_width="0dp"
+		android:layout_height="1dp"
+		android:layout_marginStart="10dp"
+		android:layout_marginEnd="10dp"
+		android:background="@color/divider_line"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintBottom_toBottomOf="parent"/>
+</android.support.constraint.ConstraintLayout>

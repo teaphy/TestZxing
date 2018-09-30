@@ -3,6 +3,14 @@
 	<string name="action_settings">Settings</string>
 
 
+	<string name="photos_folder_all">所有照片</string>
+	<string name="photos_folder_latest">最近添加</string>
+	<string name="back">返回</string>
+	<string name="cancel">取消</string>
+	<string name="preview_text">预览</string>
+	<string name="select">选择</string>
+	<string name="photos_select_num">选择(%d)</string>
+
 	<string name="app_picker_name">Applications</string>
 	<string name="bookmark_picker_name">Bookmarks</string>
 	<string name="button_add_calendar">Add to calendar</string>
@@ -127,4 +135,7 @@
 	<string name="result_wifi">Found WLAN Configuration</string>
 	<string name="sbc_name">Google Book Search</string>
 	<string name="wifi_changing_network">Requesting connection to network\u2026</string>
+	<string name="photo">照片</string>
+	<string name="folder_with_media_num">%1$s (%2$d)</string>
+
 </resources>

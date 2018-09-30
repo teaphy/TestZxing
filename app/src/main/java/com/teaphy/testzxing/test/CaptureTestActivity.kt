@@ -1,10 +1,12 @@
 package com.teaphy.testzxing.test
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.google.zxing.Result
 import com.teaphy.testzxing.R
+import com.teaphy.testzxing.photos.ui.BasePhotoSelectorActivity
 import com.teaphy.testzxing.zxing.CaptureFragment
 import com.teaphy.testzxing.zxing.CodeUtils
 import com.teaphy.testzxing.zxing.IAnalysisCallback
@@ -29,5 +31,17 @@ class CaptureTestActivity : AppCompatActivity(), IAnalysisCallback {
 		val trans = supportFragmentManager.beginTransaction()
 		trans.replace(R.id.flContainer, captureFragment)
 		trans.commit()
+
+		setListener()
+	}
+
+	private fun setListener() {
+
+
+
+		btnPhoto.setOnClickListener {
+			val intent = Intent(this@CaptureTestActivity, BasePhotoSelectorActivity::class.java)
+			startActivity(intent)
+		}
 	}
 }

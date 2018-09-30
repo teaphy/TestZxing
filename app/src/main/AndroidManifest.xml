@@ -10,6 +10,7 @@
 	<!-- unavailable in API 23 -->
 	<uses-permission android:name="com.android.browser.permission.READ_HISTORY_BOOKMARKS"/>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
@@ -29,6 +30,7 @@
 		android:allowBackup="true"
 		android:icon="@mipmap/ic_launcher"
 		android:label="@string/app_name"
+		android:name=".App"
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
 		android:theme="@style/CaptureTheme">
@@ -39,12 +41,26 @@
 			android:stateNotNeeded="true"
 			android:theme="@style/CaptureTheme"
 			android:windowSoftInputMode="stateAlwaysHidden">
+		</activity>
+		<activity android:name=".test.PhotosTestActivity">
+		</activity>
+		<activity
+			android:name=".photos.ui.PhotoSelectActivity"
+			android:screenOrientation="portrait">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
+		<activity
+			android:name=".photos.ui.PhotoFoldersActivity"
+			android:screenOrientation="portrait"/>
+		<activity
+			android:name=".photos.ui.PhotosSelectByFolderActivity"
+			android:screenOrientation="portrait"/>
+		<activity android:name=".photos.ui.PreviewMediaActivity"
+			android:screenOrientation="portrait"/>
 	</application>
 
 </manifest>

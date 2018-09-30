@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.constraint.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".photos.ui.BasePhotoSelectorActivity">
+
+	<android.support.v7.widget.RecyclerView
+		android:id="@+id/recyclerView"
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		android:paddingTop="48dp"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintBottom_toTopOf="@+id/bottomLayout"
+		app:layout_constraintTop_toTopOf="parent">
+
+
+	</android.support.v7.widget.RecyclerView>
+
+	<android.support.constraint.ConstraintLayout
+		android:id="@+id/barLayout"
+		android:layout_width="match_parent"
+		android:layout_height="48dp"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent"
+		android:background="#9F000000">
+		<TextView
+			android:id="@+id/backText"
+			android:layout_width="wrap_content"
+			android:layout_height="0dp"
+			android:paddingStart="8dp"
+			android:paddingEnd="8dp"
+			android:gravity="center"
+			android:text="@string/back"
+			android:textColor="@android:color/white"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"/>
+
+		<TextView
+			android:id="@+id/textView"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="@string/photos_folder_all"
+			android:textColor="@android:color/white"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"/>
+
+		<TextView
+			android:id="@+id/cancelText"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:gravity="center"
+			android:text="@string/cancel"
+			android:textColor="@android:color/white"
+			android:paddingEnd="8dp"
+			android:paddingStart="8dp"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintTop_toTopOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"/>
+	</android.support.constraint.ConstraintLayout>
+
+
+	<android.support.constraint.ConstraintLayout
+		android:id="@+id/bottomLayout"
+		android:layout_width="0dp"
+		android:layout_height="36dp"
+		android:background="@android:color/black"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent">
+
+		<TextView
+			android:id="@+id/previewText"
+			android:layout_width="wrap_content"
+			android:layout_height="0dp"
+			android:gravity="center"
+			android:text="@string/preview_text"
+			android:textColor="@android:color/white"
+			android:paddingStart="8dp"
+			android:paddingEnd="8dp"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"/>
+
+		<Button
+			android:id="@+id/selectButton"
+			android:layout_width="48dp"
+			android:layout_height="24dp"
+			android:layout_marginEnd="8dp"
+			android:background="@drawable/shape_r3_sol_38a503"
+			android:text="@string/select"
+			android:textSize="12sp"
+			android:textColor="@android:color/white"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintTop_toTopOf="parent"/>
+	</android.support.constraint.ConstraintLayout>
+
+
+	
+</android.support.constraint.ConstraintLayout>
