@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	package="com.teaphy.testzxing">
 
 	<uses-permission android:name="android.permission.CAMERA"/>
@@ -33,7 +34,8 @@
 		android:name=".App"
 		android:roundIcon="@mipmap/ic_launcher_round"
 		android:supportsRtl="true"
-		android:theme="@style/CaptureTheme">
+		android:theme="@style/CaptureTheme"
+		tools:ignore="GoogleAppIndexingWarning">
 		<activity
 			android:clearTaskOnLaunch="true"
 			android:name=".test.CaptureTestActivity"
@@ -60,6 +62,8 @@
 			android:name=".photos.ui.PhotosSelectByFolderActivity"
 			android:screenOrientation="portrait"/>
 		<activity android:name=".photos.ui.PreviewMediaActivity"
+			android:screenOrientation="portrait"/>
+		<activity android:name=".photos.ui.PreviewAllActivity"
 			android:screenOrientation="portrait"/>
 	</application>
 

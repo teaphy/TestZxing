@@ -1,7 +1,9 @@
 package com.teaphy.testzxing.photos.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.os.Parcelable
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -10,12 +12,16 @@ import android.widget.TextView
 import com.teaphy.testzxing.R
 import com.teaphy.testzxing.photos.entity.LocalMedia
 import android.support.v7.widget.SimpleItemAnimator
+import android.util.Log
 import android.widget.Toast
+import com.rrs.afcs.view.IItemCallback
 import com.teaphy.testzxing.photos.constant.PhotosConstant
 import com.teaphy.testzxing.photos.constant.TypeConstant
 import com.teaphy.testzxing.photos.decoration.GridSpacingItemDecoration
 import com.teaphy.testzxing.photos.listener.ISelectChangeListener
 import com.teaphy.testzxing.photos.observe.CancelSubject
+import io.reactivex.Flowable
+import timber.log.Timber
 import java.util.ArrayList
 
 
@@ -32,7 +38,7 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 
 	val listLocalMedia = mutableListOf<LocalMedia>()
 
-	val photosAdapter = PhotosAdapter(listLocalMedia)
+	val photosAdapter = PhotosAdapter()
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -46,6 +52,17 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 
 		loadLocalImage()
 	}
+
+	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		super.onActivityResult(requestCode, resultCode, data)
+
+		data?.let {
+			if (requestCode == PhotosConstant.CODE_PREVIEW_MEDIA) {
+				updateMediaSelectedUI(data)
+			}
+		}
+	}
+
 
 	private fun initData() {
 
@@ -88,6 +105,12 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 			}
 		}
 
+		photosAdapter.itemClickListener = object : IItemCallback<LocalMedia> {
+            override fun onItemClick(item: LocalMedia) {
+                openPreviewAllActivity(item)
+            }
+        }
+
 		cancelText.setOnClickListener {
 			CancelSubject.obtain().notifyObserver()
 		}
@@ -108,19 +131,59 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 		if (isCamera) {
 			listLocalMedia.add(0, LocalMedia("", "", "", TypeConstant.TYPE_IMAGE_CAMERA))
 		}
-		photosAdapter.notifyDataSetChanged()
+		photosAdapter.updateData(listLocalMedia)
 	}
 
 	private fun openPreviewMediaActivity() {
+
+        val indexPreview = 0
+
 		val intent = Intent(this, PreviewMediaActivity::class.java)
 		val bundle = Bundle()
 
 		bundle.putParcelableArrayList(PhotosConstant.KEY_CONTENT, photosAdapter.listSelected as ArrayList<LocalMedia>)
 		bundle.putParcelableArrayList(PhotosConstant.KEY_MEDIA_SELECTED, photosAdapter.listSelected)
+        bundle.putInt(PhotosConstant.KEY_POSITION, indexPreview)
 
 		intent.putExtras(bundle)
-		startActivity(intent)
+		startActivityForResult(intent, PhotosConstant.CODE_PREVIEW_MEDIA)
 	}
 
-	abstract fun loadLocalImage()
+
+	@SuppressLint("CheckResult")
+    private fun updateMediaSelectedUI(data: Intent) {
+
+
+		val listSelect = data.extras.getParcelableArrayList<LocalMedia>(PhotosConstant.KEY_CONTENT)
+
+		photosAdapter.listSelected.clear()
+		photosAdapter.listSelected.addAll(listSelect)
+
+
+        for (item in listLocalMedia) {
+            item.isChecked = listSelect.contains(item)
+        }
+
+        photosAdapter.updateData(listLocalMedia)
+
+
+	}
+
+    private fun openPreviewAllActivity(item: LocalMedia) {
+
+        val listNotNull = listLocalMedia.filter { it.path.isNotEmpty() }
+        val indexAll = listNotNull.indexOf(item)
+
+        val intent = Intent(this, PreviewAllActivity::class.java)
+        val bundle = Bundle()
+
+        bundle.putParcelableArrayList(PhotosConstant.KEY_CONTENT, listNotNull as ArrayList<LocalMedia>)
+        bundle.putParcelableArrayList(PhotosConstant.KEY_MEDIA_SELECTED, photosAdapter.listSelected as ArrayList<LocalMedia>)
+        bundle.putInt(PhotosConstant.KEY_POSITION, indexAll)
+
+        intent.putExtras(bundle)
+        startActivityForResult(intent, PhotosConstant.CODE_PREVIEW_MEDIA)
+    }
+
+    abstract fun loadLocalImage()
 }

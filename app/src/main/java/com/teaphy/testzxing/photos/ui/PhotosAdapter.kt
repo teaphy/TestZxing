@@ -3,6 +3,7 @@ package com.teaphy.testzxing.photos.ui
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.rrs.afcs.picture.PictureHelper
+import com.rrs.afcs.view.IItemCallback
 import com.teaphy.testzxing.R
 import com.teaphy.testzxing.photos.constant.TypeConstant
 import com.teaphy.testzxing.photos.entity.LocalMedia
@@ -21,12 +23,20 @@ import com.teaphy.testzxing.photos.listener.ISelectChangeListener
  * @author tiany
  * @time 2018/9/29 下午2:56
  */
-class PhotosAdapter(private val list: List<LocalMedia>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PhotosAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 	val listSelected = mutableListOf<LocalMedia>()
 	var selectChangeListener: ISelectChangeListener? = null
+	var itemClickListener: IItemCallback<LocalMedia>? = null
+    val listMedia: MutableList<LocalMedia> = mutableListOf()
 	private lateinit var context: Context
 
+    // 获取到数据进行更新
+    fun updateData(list: List<LocalMedia>) {
+        listMedia.clear()
+        listMedia.addAll(list)
+        notifyDataSetChanged()
+    }
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
 		context = parent.context
 		val view: View
@@ -42,12 +52,12 @@ class PhotosAdapter(private val list: List<LocalMedia>) : RecyclerView.Adapter<R
 	}
 
 	override fun getItemCount(): Int {
-		return list.size
+		return listMedia.size
 	}
 
 	override fun getItemViewType(position: Int): Int {
 
-		if (TextUtils.equals(TypeConstant.TYPE_IMAGE_CAMERA, list[position].pictureType)) {
+		if (TextUtils.equals(TypeConstant.TYPE_IMAGE_CAMERA, listMedia[position].pictureType)) {
 			return TypeConstant.TYPE_CAMERA
 		}
 
@@ -75,45 +85,49 @@ class PhotosAdapter(private val list: List<LocalMedia>) : RecyclerView.Adapter<R
 	 */
 	private fun handleImageUI(holder: PhotoViewHolder, position: Int) {
 
-		val localMedia = list[position]
-
+		val localMedia = listMedia[position]
+        localMedia.isChecked = listSelected.contains(localMedia)
 
 		with(localMedia) {
 			PictureHelper().loadLocalImage(holder.image, path)
-			val backgroundRes = if (isChecked) R.mipmap.ic_pigeon_selected else R.mipmap.ic_pigeon
-			holder.checkText.setBackgroundResource(backgroundRes)
+			val backgroundRes:Int
 
-			if (listSelected.contains(localMedia)) {
+			if (localMedia.isChecked) {
+				backgroundRes = R.mipmap.ic_pigeon_selected
 				val index = listSelected.indexOf(localMedia)
 				holder.checkText.text = (index + 1).toString()
 			} else {
 				holder.checkText.text = ""
+				backgroundRes = R.mipmap.ic_pigeon
 			}
+
+			holder.checkText.setBackgroundResource(backgroundRes)
 		}
 
 		holder.itemView.setOnClickListener {
-			Toast.makeText(holder.itemView.context, "查看图片：$position", Toast.LENGTH_SHORT).show()
+			itemClickListener?.onItemClick(localMedia)
 		}
 
 		holder.checkLayout.setOnClickListener {
-			localMedia.isChecked = !localMedia.isChecked
 
 			// 将localMedia添加或移除
 			if (localMedia.isChecked) {
-				if (!listSelected.contains(localMedia)) {
-					listSelected.add(localMedia)
-				}
+                localMedia.isChecked = false
+                if (listSelected.contains(localMedia)) {
+                    listSelected.remove(localMedia)
+                    notifyItemChanged(position)
+                }
 
 			} else {
-				if (listSelected.contains(localMedia)) {
-					listSelected.remove(localMedia)
-				}
-				notifyItemChanged(position)
+                localMedia.isChecked = true
+                if (!listSelected.contains(localMedia)) {
+                    listSelected.add(localMedia)
+                }
 			}
 
 			// 更新 已选择的数量
 			for (media in listSelected) {
-				notifyItemChanged(list.indexOf(media))
+				notifyItemChanged(listMedia.indexOf(media))
 			}
 
 			selectChangeListener?.onSelectChange()
