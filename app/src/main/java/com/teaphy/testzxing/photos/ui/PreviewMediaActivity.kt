@@ -1,6 +1,7 @@
 package com.teaphy.testzxing.photos.ui
 
 import com.teaphy.testzxing.R
+import com.teaphy.testzxing.photos.entity.LocalMedia
 
 
 class PreviewMediaActivity : BasePreviewMediaActivity() {
@@ -12,27 +13,28 @@ class PreviewMediaActivity : BasePreviewMediaActivity() {
 		numText.setOnClickListener {
 			val position = mediaViewPager.currentItem
 
-			val localMedia = listImage[position]
+			// 更新当前LocalMedia的状态
+			updateSelectStatus(position)
 
-			localMedia.isChecked = !localMedia.isChecked
-
-			updateSelectChangeUI(position)
-
-			updateSelectButtonUI()
+			// 更新选择数量相关的UI
+			updateNumberChangeUI()
 		}
 	}
 
-	override fun updateSelectChangeUI(position: Int) {
+	/**
+	 * 更新当前LocalMedia的状态
+	 * @param position 当前localMedia处于所有LocalMedial列表的位置
+	 */
+	override fun updateSelectStatus(position: Int) {
 		val localMedia = listImage[position]
 
-		val indexSelect = listImageSelected.indexOf(localMedia)
-		listImageSelected[indexSelect].isChecked = localMedia.isChecked
-		imageTab.getTabAt(indexSelect)!!.select()
+		// 更新LocalMedia的选中状态
+		localMedia.isChecked = !localMedia.isChecked
+		listImage[position] = localMedia
 
-		val percent = getString(R.string.percent_preview_media, position + 1, listImage.size)
-		percentText.text = percent!!
+		val posSelected = listImageSelected.indexOf(localMedia)
+		listImageSelected[posSelected] = localMedia
 
-		updateTabUI(imageTab.getTabAt(indexSelect)!!, localMedia, true)
-		updateNumUI(localMedia)
+		selectedPreviewAdapter.updateStatus(localMedia)
 	}
 }

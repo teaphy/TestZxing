@@ -3,8 +3,6 @@ package com.teaphy.testzxing.photos.ui
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Parcelable
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.widget.Button
@@ -12,16 +10,13 @@ import android.widget.TextView
 import com.teaphy.testzxing.R
 import com.teaphy.testzxing.photos.entity.LocalMedia
 import android.support.v7.widget.SimpleItemAnimator
-import android.util.Log
-import android.widget.Toast
 import com.rrs.afcs.view.IItemCallback
-import com.teaphy.testzxing.photos.constant.PhotosConstant
-import com.teaphy.testzxing.photos.constant.TypeConstant
+import com.teaphy.testzxing.photos.config.PictureConfig
+import com.teaphy.testzxing.photos.config.PictureSelectConfig
+import com.teaphy.testzxing.photos.constant.PictureTypeConstant
 import com.teaphy.testzxing.photos.decoration.GridSpacingItemDecoration
 import com.teaphy.testzxing.photos.listener.ISelectChangeListener
 import com.teaphy.testzxing.photos.observe.CancelSubject
-import io.reactivex.Flowable
-import timber.log.Timber
 import java.util.ArrayList
 
 
@@ -57,7 +52,7 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 		super.onActivityResult(requestCode, resultCode, data)
 
 		data?.let {
-			if (requestCode == PhotosConstant.CODE_PREVIEW_MEDIA) {
+			if (requestCode == PictureConfig.CODE_PREVIEW_MEDIA) {
 				updateMediaSelectedUI(data)
 			}
 		}
@@ -94,11 +89,25 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 		photosAdapter.selectChangeListener = object : ISelectChangeListener {
 			override fun onSelectChange() {
 				val countSelect = photosAdapter.listSelected.size
+				val isSelected = countSelect > 0
+				val preEnable: Boolean = isSelected
+				val preClickable: Boolean = isSelected
+				val preAlpha: Float = if (isSelected) {
+					1.0F
+				} else {
+					0.5F
+				}
 
 				val selectDesc = if (countSelect > 0) {
 					getString(R.string.photos_select_num, countSelect)
 				} else {
 					getString(R.string.select)
+				}
+
+				with(previewText) {
+					isEnabled = preEnable
+					isClickable = preClickable
+					alpha = preAlpha
 				}
 
 				selectButton.text = selectDesc
@@ -118,6 +127,10 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 		previewText.setOnClickListener {
 			openPreviewMediaActivity()
 		}
+
+		selectButton.setOnClickListener {
+			forSelectResult()
+		}
 	}
 
 
@@ -125,11 +138,15 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 	 * 更新本地图片列表
 	 */
 	fun refreshMedia(list: List<LocalMedia>, isCamera: Boolean) {
-		listLocalMedia.clear()
-		listLocalMedia.addAll(list)
+
+		if (list.isNotEmpty()) {
+			listLocalMedia.clear()
+			listLocalMedia.addAll(list)
+		}
+
 		// 是否显示相机
 		if (isCamera) {
-			listLocalMedia.add(0, LocalMedia("", "", "", TypeConstant.TYPE_IMAGE_CAMERA))
+			listLocalMedia.add(0, LocalMedia("", "", "", PictureTypeConstant.TYPE_IMAGE_CAMERA))
 		}
 		photosAdapter.updateData(listLocalMedia)
 	}
@@ -141,20 +158,30 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 		val intent = Intent(this, PreviewMediaActivity::class.java)
 		val bundle = Bundle()
 
-		bundle.putParcelableArrayList(PhotosConstant.KEY_CONTENT, photosAdapter.listSelected as ArrayList<LocalMedia>)
-		bundle.putParcelableArrayList(PhotosConstant.KEY_MEDIA_SELECTED, photosAdapter.listSelected)
-        bundle.putInt(PhotosConstant.KEY_POSITION, indexPreview)
+		bundle.putParcelableArrayList(PictureConfig.KEY_CONTENT, photosAdapter.listSelected as ArrayList<LocalMedia>)
+		bundle.putParcelableArrayList(PictureConfig.KEY_MEDIA_SELECTED, photosAdapter.listSelected)
+        bundle.putInt(PictureConfig.KEY_POSITION, indexPreview)
 
 		intent.putExtras(bundle)
-		startActivityForResult(intent, PhotosConstant.CODE_PREVIEW_MEDIA)
+		startActivityForResult(intent, PictureConfig.CODE_PREVIEW_MEDIA)
 	}
 
+	/**
+	 * 图片选择结果
+	 */
+	private fun forSelectResult() {
+		if (photosAdapter.listSelected.isNotEmpty()) {
+			PictureSelectConfig.getInstance()
+					.localMediaLoaderListener?.onSelected(photosAdapter.listSelected as List<LocalMedia>)
+		}
+
+		CancelSubject.obtain().notifyObserver()
+	}
 
 	@SuppressLint("CheckResult")
     private fun updateMediaSelectedUI(data: Intent) {
 
-
-		val listSelect = data.extras.getParcelableArrayList<LocalMedia>(PhotosConstant.KEY_CONTENT)
+		val listSelect = data.extras.getParcelableArrayList<LocalMedia>(PictureConfig.KEY_CONTENT)
 
 		photosAdapter.listSelected.clear()
 		photosAdapter.listSelected.addAll(listSelect)
@@ -172,17 +199,17 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
     private fun openPreviewAllActivity(item: LocalMedia) {
 
         val listNotNull = listLocalMedia.filter { it.path.isNotEmpty() }
-        val indexAll = listNotNull.indexOf(item)
+	    val indexAll = listNotNull.indexOf(item)
 
         val intent = Intent(this, PreviewAllActivity::class.java)
         val bundle = Bundle()
 
-        bundle.putParcelableArrayList(PhotosConstant.KEY_CONTENT, listNotNull as ArrayList<LocalMedia>)
-        bundle.putParcelableArrayList(PhotosConstant.KEY_MEDIA_SELECTED, photosAdapter.listSelected as ArrayList<LocalMedia>)
-        bundle.putInt(PhotosConstant.KEY_POSITION, indexAll)
+        bundle.putParcelableArrayList(PictureConfig.KEY_CONTENT, listNotNull as ArrayList<LocalMedia>)
+        bundle.putParcelableArrayList(PictureConfig.KEY_MEDIA_SELECTED, photosAdapter.listSelected as ArrayList<LocalMedia>)
+        bundle.putInt(PictureConfig.KEY_POSITION, indexAll)
 
         intent.putExtras(bundle)
-        startActivityForResult(intent, PhotosConstant.CODE_PREVIEW_MEDIA)
+        startActivityForResult(intent, PictureConfig.CODE_PREVIEW_MEDIA)
     }
 
     abstract fun loadLocalImage()

@@ -7,7 +7,7 @@
 	android:layout_height="match_parent"
 	tools:context=".photos.ui.PreviewMediaActivity">
 
-	<android.support.v4.view.ViewPager
+	<com.teaphy.testzxing.photos.widget.CustomViewPager
 		android:id="@+id/mediaViewPager"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
@@ -17,7 +17,7 @@
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent">
 
-	</android.support.v4.view.ViewPager>
+	</com.teaphy.testzxing.photos.widget.CustomViewPager>
 
 	<android.support.constraint.ConstraintLayout
 		android:id="@+id/titleLayout"
@@ -30,30 +30,30 @@
 
 
 		<LinearLayout
-            android:id="@+id/backLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" >
+			android:id="@+id/backLayout"
+			android:layout_width="wrap_content"
+			android:layout_height="match_parent"
+			android:paddingStart="10dp"
+			android:paddingEnd="10dp"
+			android:gravity="center_vertical"
+			app:layout_constraintBottom_toBottomOf="parent"
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:src="@mipmap/ic_left_white"
-                />
+			<ImageView
+				android:layout_width="18dp"
+				android:layout_height="18dp"
+				android:src="@mipmap/ic_left_white"
+				/>
 
-            <TextView
-                android:id="@+id/percentText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textColor="@android:color/white"
-                android:layout_marginStart="3dp"/>
-        </LinearLayout>
+			<TextView
+				android:id="@+id/percentText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_marginStart="3dp"
+				android:textColor="@android:color/white"
+				android:textSize="16sp"/>
+		</LinearLayout>
 
 
 		<TextView
@@ -61,7 +61,7 @@
 			android:layout_width="18dp"
 			android:layout_height="18dp"
 			android:layout_marginEnd="14dp"
-			android:background="@mipmap/ic_pigeon_selected"
+			android:background="@mipmap/ic_pigeon"
 			android:gravity="center"
 			android:text="9"
 			android:textColor="@android:color/white"
@@ -74,7 +74,7 @@
 	<android.support.constraint.ConstraintLayout
 		android:id="@+id/bottomLayout"
 		android:layout_width="match_parent"
-		android:layout_height="108dp"
+		android:layout_height="wrap_content"
 		android:background="@color/background_trans"
 		app:layout_constraintBottom_toBottomOf="parent">
 
@@ -101,19 +101,19 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintTop_toBottomOf="@+id/view"/>
 
-		<android.support.design.widget.TabLayout
-			android:id="@+id/imageTab"
+		<android.support.v7.widget.RecyclerView
+			android:id="@+id/mediaRecyclerView"
 			android:layout_width="0dp"
 			android:layout_height="48dp"
-			app:elevation="0dp"
-			app:tabBackground="@android:color/transparent"
-			app:tabIndicatorColor="@android:color/transparent"
+			android:layout_marginTop="16dp"
+			android:layout_marginBottom="16dp"
 			app:layout_constraintBottom_toTopOf="@+id/view"
-			app:layout_constraintTop_toTopOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
-			app:layout_constraintStart_toStartOf="parent">
+			app:layout_constraintStart_toStartOf="parent"
+			app:layout_constraintTop_toTopOf="parent"
+			app:tabIndicatorHeight="0dp">
 
-		</android.support.design.widget.TabLayout>
+		</android.support.v7.widget.RecyclerView>
 
 	</android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

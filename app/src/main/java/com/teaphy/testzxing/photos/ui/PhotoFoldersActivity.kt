@@ -7,7 +7,7 @@ import android.support.v7.widget.RecyclerView
 import android.widget.TextView
 import com.rrs.afcs.view.IItemCallback
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.constant.PhotosConstant
+import com.teaphy.testzxing.photos.config.PictureConfig
 import com.teaphy.testzxing.photos.entity.LocalMedia
 import com.teaphy.testzxing.photos.entity.LocalMediaFolder
 import com.teaphy.testzxing.photos.loader.ILocalMediaLoadListener
@@ -63,7 +63,7 @@ class PhotoFoldersActivity : BasePhotosActivity() {
 		val intent = Intent(this, PhotosSelectByFolderActivity::class.java)
 		val bundle = Bundle()
 
-		bundle.putParcelableArrayList(PhotosConstant.KEY_CONTENT, images as ArrayList<LocalMedia>)
+		bundle.putParcelableArrayList(PictureConfig.KEY_CONTENT, images as ArrayList<LocalMedia>)
 
 		intent.putExtras(bundle)
 		startActivity(intent)

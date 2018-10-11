@@ -3,7 +3,6 @@ package com.teaphy.testzxing.photos.ui
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,7 @@ import android.widget.Toast
 import com.rrs.afcs.picture.PictureHelper
 import com.rrs.afcs.view.IItemCallback
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.constant.TypeConstant
+import com.teaphy.testzxing.photos.constant.PictureTypeConstant
 import com.teaphy.testzxing.photos.entity.LocalMedia
 import com.teaphy.testzxing.photos.listener.ISelectChangeListener
 
@@ -41,7 +40,7 @@ class PhotosAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 		context = parent.context
 		val view: View
 		val inflater = LayoutInflater.from(context)
-		if (viewType == TypeConstant.TYPE_CAMERA) {
+		if (viewType == PictureTypeConstant.TYPE_CAMERA) {
 			view = inflater.inflate(R.layout.item_camera_layout, parent, false)
 			return CameraViewHolder(view)
 		}
@@ -57,11 +56,11 @@ class PhotosAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 	override fun getItemViewType(position: Int): Int {
 
-		if (TextUtils.equals(TypeConstant.TYPE_IMAGE_CAMERA, listMedia[position].pictureType)) {
-			return TypeConstant.TYPE_CAMERA
+		if (TextUtils.equals(PictureTypeConstant.TYPE_IMAGE_CAMERA, listMedia[position].pictureType)) {
+			return PictureTypeConstant.TYPE_CAMERA
 		}
 
-		return TypeConstant.TYPE_IMAGE
+		return PictureTypeConstant.TYPE_IMAGE
 	}
 
 	override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {

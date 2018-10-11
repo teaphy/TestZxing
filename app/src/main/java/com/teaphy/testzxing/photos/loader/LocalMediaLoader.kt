@@ -12,7 +12,7 @@ import com.teaphy.testzxing.photos.entity.LocalMedia
 import timber.log.Timber
 import android.text.TextUtils
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.constant.PhotosConstant
+import com.teaphy.testzxing.photos.config.PictureConfig
 import com.teaphy.testzxing.photos.entity.LocalMediaFolder
 import java.io.File
 import java.util.*
@@ -55,7 +55,7 @@ class LocalMediaLoader(private val activity: FragmentActivity, private val isGif
 
 
 	public fun loadAllMedia(localMediaLoadListener: ILocalMediaLoadListener) {
-		activity.supportLoaderManager.initLoader(0,
+		LoaderManager.getInstance<FragmentActivity>(activity).initLoader(0,
 				null,
 				object : LoaderManager.LoaderCallbacks<Cursor> {
 					/**
@@ -81,12 +81,12 @@ class LocalMediaLoader(private val activity: FragmentActivity, private val isGif
 					 * loader完成查询时调用，通常用于在查询到的cursor中提取数据
 					 */
 					override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
-
+						// 本地所有图片的文件夹
+						val localImageFolders = mutableListOf<LocalMediaFolder>()
 						try {
 							// 当前所有图片列表
 							val localImages = mutableListOf<LocalMedia>()
-							// 本地所有图片的文件夹
-							val localImageFolders = mutableListOf<LocalMediaFolder>()
+
 							// `最近添加`文件夹
 							val localLatelyFolder = LocalMediaFolder(activity.getString(R.string.photos_folder_latest),
 									"", "")
@@ -94,13 +94,12 @@ class LocalMediaLoader(private val activity: FragmentActivity, private val isGif
 							val localAllFolder = LocalMediaFolder(activity.getString(R.string.photos_folder_all),
 									"", "")
 
+							if (data == null || data.count <= 0) {
+								localMediaLoadListener.loadComplete(localImageFolders)
+								return
+							}
 
-							data?.let {
-								val count = data.count
-
-								if (count <= 0) {
-									return@let
-								}
+							data.let {
 
 								data.moveToFirst()
 
@@ -150,6 +149,7 @@ class LocalMediaLoader(private val activity: FragmentActivity, private val isGif
 
 							localMediaLoadListener.loadComplete(localImageFolders)
 						} catch (e: Exception) {
+							localMediaLoadListener.loadComplete(localImageFolders)
 							Timber.e("$e")
 						}
 					}
@@ -207,7 +207,7 @@ class LocalMediaLoader(private val activity: FragmentActivity, private val isGif
 		val curCalendar = Calendar.getInstance() ?: return false
 
 		// 设置日期为LATELY_DYS天前
-		curCalendar.set(Calendar.DATE, curCalendar.get(Calendar.DATE) - PhotosConstant.LATELY_DYS)
+		curCalendar.set(Calendar.DATE, curCalendar.get(Calendar.DATE) - PictureConfig.LATELY_DYS)
 		return Date(lastModify * 1000).after(curCalendar.time)
 	}
 }

@@ -5,7 +5,7 @@ package com.teaphy.testzxing.photos.constant
  * @author tiany
  * @time 2018/9/29 下午3:07
  */
-class TypeConstant {
+class PictureTypeConstant {
 
 	companion object {
 
@@ -13,6 +13,7 @@ class TypeConstant {
 
 		const val TYPE_CAMERA = 1
 		const val TYPE_IMAGE = 2
+
 	}
 
 }

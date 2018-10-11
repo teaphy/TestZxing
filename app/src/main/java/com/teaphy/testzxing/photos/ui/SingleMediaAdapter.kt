@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.rrs.afcs.picture.PictureHelper
+import com.rrs.afcs.view.IItemCallback
 import com.teaphy.testzxing.R
 import com.teaphy.testzxing.photos.entity.LocalMedia
 
@@ -15,6 +16,8 @@ import com.teaphy.testzxing.photos.entity.LocalMedia
  * @time 2018/9/30 下午3:17
  */
 class SingleMediaAdapter(private val listImage: List<LocalMedia>) : PagerAdapter() {
+
+	var itemClickListener: IItemCallback<LocalMedia>? = null
 
 	override fun isViewFromObject(view: View, any: Any): Boolean {
 		return view == any
@@ -36,6 +39,11 @@ class SingleMediaAdapter(private val listImage: List<LocalMedia>) : PagerAdapter
 
 		PictureHelper().loadLocalImage(previewImage, localMedia.path)
 		container.addView(contentView, 0)
+
+		contentView.setOnClickListener {
+			itemClickListener?.onItemClick(localMedia)
+		}
+
 		return contentView
 	}
 }

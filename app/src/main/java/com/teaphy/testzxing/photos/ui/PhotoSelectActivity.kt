@@ -5,6 +5,7 @@ import com.teaphy.testzxing.R
 import com.teaphy.testzxing.photos.entity.LocalMediaFolder
 import com.teaphy.testzxing.photos.loader.ILocalMediaLoadListener
 import com.teaphy.testzxing.photos.loader.LocalMediaLoader
+import timber.log.Timber
 
 /**
  * @desc 选择图片 - 从本地Media数据库读取图片列表
@@ -31,9 +32,9 @@ class PhotoSelectActivity : BasePhotoSelectorActivity() {
 					override fun loadComplete(localImageFolders: List<LocalMediaFolder>) {
 						val images = localImageFolders[0].images
 
-						if (images.isNotEmpty()) {
-							refreshMedia(images, true)
-						}
+						Timber.e("images:$images")
+
+						refreshMedia(images, true)
 					}
 				})
 	}

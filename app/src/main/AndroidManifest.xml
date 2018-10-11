@@ -36,6 +36,15 @@
 		android:supportsRtl="true"
 		android:theme="@style/CaptureTheme"
 		tools:ignore="GoogleAppIndexingWarning">
+
+		<activity android:name=".test.TestLaunchActivity">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"/>
+
+				<category android:name="android.intent.category.LAUNCHER"/>
+			</intent-filter>
+		</activity>
+
 		<activity
 			android:clearTaskOnLaunch="true"
 			android:name=".test.CaptureTestActivity"
@@ -49,11 +58,6 @@
 		<activity
 			android:name=".photos.ui.PhotoSelectActivity"
 			android:screenOrientation="portrait">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN"/>
-
-				<category android:name="android.intent.category.LAUNCHER"/>
-			</intent-filter>
 		</activity>
 		<activity
 			android:name=".photos.ui.PhotoFoldersActivity"
@@ -61,10 +65,15 @@
 		<activity
 			android:name=".photos.ui.PhotosSelectByFolderActivity"
 			android:screenOrientation="portrait"/>
-		<activity android:name=".photos.ui.PreviewMediaActivity"
+		<activity
+			android:name=".photos.ui.PreviewMediaActivity"
 			android:screenOrientation="portrait"/>
-		<activity android:name=".photos.ui.PreviewAllActivity"
+		<activity
+			android:name=".photos.ui.PreviewAllActivity"
 			android:screenOrientation="portrait"/>
+		<activity android:name=".photos.ui.ExternalPreviewActivity">
+		</activity>
+
 	</application>
 
 </manifest>

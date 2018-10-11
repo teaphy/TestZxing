@@ -5,25 +5,21 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
+	android:gravity="center"
 	android:orientation="vertical"
-	tools:context=".test.PhotosTestActivity">
+	tools:context=".test.TestLaunchActivity">
 
 	<Button
-		android:id="@+id/select_button"
+		android:id="@+id/picture_button"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="选择"/>
+		android:textAllCaps="false"
+		android:text="Picture"/>
 
 	<Button
-		android:id="@+id/preview_button"
+		android:id="@+id/zxing_button"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:text="预览"/>
-
-	<TextView
-		android:id="@+id/media_text"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent"
-		android:paddingEnd="14dp"
-		android:paddingStart="14dp"/>
+		android:textAllCaps="false"
+		android:text="Zxing"/>
 </LinearLayout>
