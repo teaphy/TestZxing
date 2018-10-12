@@ -1,6 +1,8 @@
 package com.teaphy.testzxing.photos.ui
 
+import android.widget.Toast
 import com.teaphy.testzxing.R
+import com.teaphy.testzxing.photos.config.PictureSelectConfig
 import com.teaphy.testzxing.photos.entity.LocalMedia
 
 
@@ -12,6 +14,15 @@ class PreviewMediaActivity : BasePreviewMediaActivity() {
 
 		numText.setOnClickListener {
 			val position = mediaViewPager.currentItem
+			val localMedia = listImage[position]
+			if (!localMedia.isChecked) {
+				if (listImageSelected.size >= PictureSelectConfig.getInstance().maxSelectNumber) {
+					Toast.makeText(this,
+							getString(R.string.select_max_prompt, PictureSelectConfig.getInstance().maxSelectNumber),
+							Toast.LENGTH_SHORT).show()
+					return@setOnClickListener
+				}
+			}
 
 			// 更新当前LocalMedia的状态
 			updateSelectStatus(position)

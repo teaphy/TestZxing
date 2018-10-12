@@ -213,7 +213,7 @@ abstract class BasePreviewMediaActivity : BasePhotosActivity() {
 	 */
 	private fun isDisplay(localMedia: LocalMedia): Boolean {
 		val lmCur = listImage[mediaViewPager.currentItem]
-		return lmCur.id == localMedia.id
+		return lmCur.path == localMedia.path
 	}
 
 	/**

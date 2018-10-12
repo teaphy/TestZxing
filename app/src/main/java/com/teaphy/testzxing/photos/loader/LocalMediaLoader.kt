@@ -3,7 +3,9 @@ package com.teaphy.testzxing.photos.loader
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.provider.MediaStore.Files.FileColumns.DATA
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.LoaderManager
 import android.support.v4.content.CursorLoader
@@ -112,7 +114,7 @@ class LocalMediaLoader(private val activity: FragmentActivity, private val isGif
 									val height = data.getInt(data.getColumnIndexOrThrow(PROJECTION[5]))
 									val lastModify = data.getLong(data.getColumnIndexOrThrow(PROJECTION[6]))
 
-									val image = LocalMedia(id, path, name, pictureType, width, height, lastModify)
+									val image = LocalMedia(path, name, pictureType, width, height, lastModify)
 
 									// 获取文件夹名称
 									val folder = getImageFolder(path, localImageFolders)
@@ -131,6 +133,7 @@ class LocalMediaLoader(private val activity: FragmentActivity, private val isGif
 									// 将图片添加到所有图片列表
 									localImages.add(image)
 								} while (data.moveToNext())
+
 							}
 
 							/**
@@ -162,7 +165,6 @@ class LocalMediaLoader(private val activity: FragmentActivity, private val isGif
 
 				})
 	}
-
 	/**
 	 * 获取当前图片的
 	 */

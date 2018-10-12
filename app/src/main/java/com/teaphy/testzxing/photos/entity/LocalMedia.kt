@@ -9,8 +9,7 @@ import android.os.Parcelable
  * @author tiany
  * @time 2018/9/29 上午10:00
  */
-data class LocalMedia(val id: String,
-                      val path: String,
+data class LocalMedia(val path: String,
                       val name: String,
                       val pictureType: String,
                       val width: Int = 0,
@@ -19,7 +18,6 @@ data class LocalMedia(val id: String,
                       var isChecked: Boolean = false) : Parcelable {
 
 	constructor(parcel: Parcel) : this(
-			parcel.readString(),
 			parcel.readString(),
 			parcel.readString(),
 			parcel.readString(),
@@ -38,15 +36,14 @@ data class LocalMedia(val id: String,
 			return false
 		}
 
-		return this.id == other.id
+		return this.path == other.path
 	}
 
 	override fun hashCode(): Int {
-		return id.hashCode()
+		return path.hashCode()
 	}
 
 	override fun writeToParcel(parcel: Parcel, flags: Int) {
-		parcel.writeString(id)
 		parcel.writeString(path)
 		parcel.writeString(name)
 		parcel.writeString(pictureType)

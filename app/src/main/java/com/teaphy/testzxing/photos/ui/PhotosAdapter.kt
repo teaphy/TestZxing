@@ -13,6 +13,8 @@ import android.widget.Toast
 import com.rrs.afcs.picture.PictureHelper
 import com.rrs.afcs.view.IItemCallback
 import com.teaphy.testzxing.R
+import com.teaphy.testzxing.photos.config.PictureConfig
+import com.teaphy.testzxing.photos.config.PictureSelectConfig
 import com.teaphy.testzxing.photos.constant.PictureTypeConstant
 import com.teaphy.testzxing.photos.entity.LocalMedia
 import com.teaphy.testzxing.photos.listener.ISelectChangeListener
@@ -22,11 +24,12 @@ import com.teaphy.testzxing.photos.listener.ISelectChangeListener
  * @author tiany
  * @time 2018/9/29 下午2:56
  */
-class PhotosAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class PhotosAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 	val listSelected = mutableListOf<LocalMedia>()
 	var selectChangeListener: ISelectChangeListener? = null
 	var itemClickListener: IItemCallback<LocalMedia>? = null
+	var cameraClickListener: View.OnClickListener? = null
     val listMedia: MutableList<LocalMedia> = mutableListOf()
 	private lateinit var context: Context
 
@@ -75,7 +78,7 @@ class PhotosAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 	 */
 	private fun handleCameraUI(holder: CameraViewHolder) {
 		holder.itemView.setOnClickListener {
-			Toast.makeText(holder.itemView.context, "拍照", Toast.LENGTH_SHORT).show()
+			cameraClickListener?.onClick(it)
 		}
 	}
 
@@ -118,6 +121,13 @@ class PhotosAdapter() : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 }
 
 			} else {
+				if (listSelected.size >= PictureSelectConfig.getInstance().maxSelectNumber) {
+					Toast.makeText(context,
+							context.getString(R.string.select_max_prompt, PictureSelectConfig.getInstance().maxSelectNumber),
+							Toast.LENGTH_SHORT).show()
+					return@setOnClickListener
+				}
+
                 localMedia.isChecked = true
                 if (!listSelected.contains(localMedia)) {
                     listSelected.add(localMedia)

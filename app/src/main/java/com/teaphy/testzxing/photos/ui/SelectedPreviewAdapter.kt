@@ -81,7 +81,7 @@ class SelectedPreviewAdapter() : RecyclerView.Adapter<SelectedPreviewAdapter.Vie
 			return false
 		}
 
-		return localMediaCurrent!!.id == localMedia.id
+		return localMediaCurrent!!.path == localMedia.path
 	}
 
 

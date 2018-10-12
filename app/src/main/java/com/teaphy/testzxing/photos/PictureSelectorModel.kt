@@ -77,7 +77,7 @@ class PictureSelectorModel(val pictureSelectors: PictureSelectors) {
 	/**
 	 * 开启选择图片并将回调结果
 	 */
-	fun requestMededias(loadListener: IMediaSelectListener) {
+	fun requestMedias(loadListener: IMediaSelectListener) {
 		pictureSelectConfig.localMediaLoaderListener = loadListener
 
 		if (!DoubleUtils.isFastDoubleClick) {

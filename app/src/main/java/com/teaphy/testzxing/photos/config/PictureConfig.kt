@@ -19,7 +19,11 @@ class PictureConfig {
 
 		const val CODE_PREVIEW_MEDIA = 0x01
 
+		const val CODE_TAKE_PHOTO = 0x02
+
 		const val SINGLE = 1
 		const val MULTIPLE = 2
+
+
 	}
 }

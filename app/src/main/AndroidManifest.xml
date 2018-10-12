@@ -37,6 +37,16 @@
 		android:theme="@style/CaptureTheme"
 		tools:ignore="GoogleAppIndexingWarning">
 
+		<provider
+			android:authorities="com.teaphy.testzxing"
+			android:exported="false"
+			android:grantUriPermissions="true"
+			android:name="android.support.v4.content.FileProvider">
+			<meta-data
+				android:name="android.support.FILE_PROVIDER_PATHS"
+				android:resource="@xml/file_paths"/>
+		</provider>
+
 		<activity android:name=".test.TestLaunchActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
