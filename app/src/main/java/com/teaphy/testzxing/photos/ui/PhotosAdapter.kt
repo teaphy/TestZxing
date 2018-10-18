@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.ui
+package com.rrs.afcs.photos.ui
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -13,11 +13,11 @@ import android.widget.Toast
 import com.rrs.afcs.picture.PictureHelper
 import com.rrs.afcs.view.IItemCallback
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.config.PictureConfig
-import com.teaphy.testzxing.photos.config.PictureSelectConfig
-import com.teaphy.testzxing.photos.constant.PictureTypeConstant
-import com.teaphy.testzxing.photos.entity.LocalMedia
-import com.teaphy.testzxing.photos.listener.ISelectChangeListener
+import com.rrs.afcs.photos.config.PictureConfig
+import com.rrs.afcs.photos.config.PictureSelectConfig
+import com.rrs.afcs.photos.constant.PictureTypeConstant
+import com.rrs.afcs.photos.entity.LocalMedia
+import com.rrs.afcs.photos.listener.ISelectChangeListener
 
 /**
  * @desc 图片列表Adapter
@@ -112,34 +112,42 @@ class PhotosAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
 		holder.checkLayout.setOnClickListener {
 
-			// 将localMedia添加或移除
-			if (localMedia.isChecked) {
-                localMedia.isChecked = false
-                if (listSelected.contains(localMedia)) {
-                    listSelected.remove(localMedia)
-                    notifyItemChanged(position)
-                }
+			// 单选模式
+			if (PictureSelectConfig.getInstance().selectModel == PictureSelectConfig.SelectModel.SINGLE) {
+				listSelected.clear()
+				listSelected.add(localMedia)
+				selectChangeListener?.onSelectChange(localMedia)
+			} else { // 多选模式
+				// 将localMedia添加或移除
+				if (localMedia.isChecked) {
+					localMedia.isChecked = false
+					if (listSelected.contains(localMedia)) {
+						listSelected.remove(localMedia)
+						notifyItemChanged(position)
+					}
 
-			} else {
-				if (listSelected.size >= PictureSelectConfig.getInstance().maxSelectNumber) {
-					Toast.makeText(context,
-							context.getString(R.string.select_max_prompt, PictureSelectConfig.getInstance().maxSelectNumber),
-							Toast.LENGTH_SHORT).show()
-					return@setOnClickListener
+				} else {
+					if (listSelected.size >= PictureSelectConfig.getInstance().maxSelectNumber) {
+						Toast.makeText(context,
+								context.getString(R.string.select_max_prompt, PictureSelectConfig.getInstance().maxSelectNumber),
+								Toast.LENGTH_SHORT).show()
+						return@setOnClickListener
+					}
+
+					localMedia.isChecked = true
+
+					if (!listSelected.contains(localMedia)) {
+						listSelected.add(localMedia)
+					}
 				}
 
-                localMedia.isChecked = true
-                if (!listSelected.contains(localMedia)) {
-                    listSelected.add(localMedia)
-                }
-			}
+				// 更新 已选择的数量
+				for (media in listSelected) {
+					notifyItemChanged(listMedia.indexOf(media))
+				}
 
-			// 更新 已选择的数量
-			for (media in listSelected) {
-				notifyItemChanged(listMedia.indexOf(media))
+				selectChangeListener?.onSelectChange(localMedia)
 			}
-
-			selectChangeListener?.onSelectChange()
 		}
 	}
 

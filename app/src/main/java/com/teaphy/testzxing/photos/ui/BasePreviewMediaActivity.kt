@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.ui
+package com.rrs.afcs.photos.ui
 
 import android.app.Activity
 import android.content.Intent
@@ -13,15 +13,16 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import com.blankj.utilcode.util.SizeUtils
 import com.rrs.afcs.picture.PictureHelper
 import com.rrs.afcs.view.IItemCallback
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.config.PictureConfig
-import com.teaphy.testzxing.photos.config.PictureSelectConfig
-import com.teaphy.testzxing.photos.decoration.SpacesItemDecoration
-import com.teaphy.testzxing.photos.entity.LocalMedia
-import com.teaphy.testzxing.photos.observe.CancelSubject
-import com.teaphy.testzxing.photos.widget.CustomViewPager
+import com.rrs.afcs.photos.config.PictureConfig
+import com.rrs.afcs.photos.config.PictureSelectConfig
+import com.rrs.afcs.photos.decoration.SpacesItemDecoration
+import com.rrs.afcs.photos.entity.LocalMedia
+import com.rrs.afcs.photos.observe.CancelSubject
+import com.rrs.afcs.photos.widget.CustomViewPager
 
 abstract class BasePreviewMediaActivity : BasePhotosActivity() {
 
@@ -49,6 +50,8 @@ abstract class BasePreviewMediaActivity : BasePhotosActivity() {
 
 		initView()
 
+		initPreAndSelView()
+
 		setListener()
 
 		loadMediaData()
@@ -63,17 +66,37 @@ abstract class BasePreviewMediaActivity : BasePhotosActivity() {
 		backLayout = findViewById(R.id.backLayout)
 		numText = findViewById(R.id.numText)
 		percentText = findViewById(R.id.percentText)
-		selectButton = findViewById(R.id.selectButton)
-		mediaRecyclerView = findViewById(R.id.mediaRecyclerView)
-		bottomLayout = findViewById(R.id.bottomLayout)
+
 		titleLayout = findViewById(R.id.titleLayout)
 
 		mediaViewPager.adapter = mediaAdapter
+	}
 
-		with(mediaRecyclerView) {
-			layoutManager = LinearLayoutManager(this@BasePreviewMediaActivity, LinearLayoutManager.HORIZONTAL, false)
-			addItemDecoration(SpacesItemDecoration(16))
-			adapter = selectedPreviewAdapter
+	/**
+	 * 初始化 预览和选择按钮
+	 */
+	private fun initPreAndSelView() {
+		// 单选模式
+		if (PictureSelectConfig.getInstance().selectModel == PictureSelectConfig.SelectModel.SINGLE) {
+			bottomLayout = findViewById(R.id.bottomLayout)
+
+			bottomLayout.visibility = View.GONE
+		} else { // 多选模式
+			bottomLayout = findViewById(R.id.bottomLayout)
+
+			bottomLayout.visibility = View.VISIBLE
+			mediaRecyclerView = findViewById(R.id.mediaRecyclerView)
+			selectButton = findViewById(R.id.selectButton)
+
+			with(mediaRecyclerView) {
+				layoutManager = LinearLayoutManager(this@BasePreviewMediaActivity, LinearLayoutManager.HORIZONTAL, false)
+				addItemDecoration(SpacesItemDecoration(SizeUtils.dp2px(6f)))
+				adapter = selectedPreviewAdapter
+			}
+
+			selectButton.setOnClickListener {
+				forSelectResult()
+			}
 		}
 	}
 
@@ -83,13 +106,11 @@ abstract class BasePreviewMediaActivity : BasePhotosActivity() {
 			finish()
 		}
 
-		selectButton.setOnClickListener {
-			forSelectResult()
-		}
-
 		mediaAdapter.itemClickListener = object : IItemCallback<LocalMedia>{
 			override fun onItemClick(item: LocalMedia) {
-				hideOrShow(bottomLayout)
+				if (PictureSelectConfig.getInstance().selectModel == PictureSelectConfig.SelectModel.MULTIPLE) {
+					hideOrShow(bottomLayout)
+				}
 				hideOrShow(titleLayout)
 			}
 		}
@@ -232,8 +253,12 @@ abstract class BasePreviewMediaActivity : BasePhotosActivity() {
 		// 更新 当前选中状态 UI
 		updateSelectedStatusUI()
 
-		// 更新选择按钮UI
-		updateSelectButtonUI()
+		// 多选模式
+		if (PictureSelectConfig.getInstance().selectModel == PictureSelectConfig.SelectModel.MULTIPLE) {
+			// 更新选择按钮UI
+			updateSelectButtonUI()
+		}
+
 
 		// 更新百分比显示
 		updatePercentText()
@@ -263,6 +288,7 @@ abstract class BasePreviewMediaActivity : BasePhotosActivity() {
 	private fun updateSelectButtonUI() {
 
 		val countSelect = listImageSelected.filter { it.isChecked }.size
+
 
 		val selectDesc = if (countSelect > 0) {
 			getString(R.string.photos_select_num, countSelect)
@@ -295,7 +321,7 @@ abstract class BasePreviewMediaActivity : BasePhotosActivity() {
 	/**
 	 * 图片选择结果
 	 */
-	private fun forSelectResult() {
+	protected fun forSelectResult() {
 		val listSelected = listImageSelected.filter { it.isChecked }
 		if (listSelected.isNotEmpty()) {
 			PictureSelectConfig.getInstance()

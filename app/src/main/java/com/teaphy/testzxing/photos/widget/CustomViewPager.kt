@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.widget
+package com.rrs.afcs.photos.widget
 
 import android.content.Context
 import android.support.v4.view.ViewPager

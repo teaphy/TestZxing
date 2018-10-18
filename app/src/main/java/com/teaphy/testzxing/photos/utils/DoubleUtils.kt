@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.utils
+package com.rrs.afcs.photos.utils
 
 /**
  * @author tiany

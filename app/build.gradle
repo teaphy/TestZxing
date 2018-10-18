@@ -42,4 +42,5 @@ dependencies {
 	implementation deps.glide.runtime
 	kapt deps.glide.compiler
 	implementation 'com.jakewharton.timber:timber:4.7.1'
+	implementation 'com.blankj:utilcode:1.15.0'
 }

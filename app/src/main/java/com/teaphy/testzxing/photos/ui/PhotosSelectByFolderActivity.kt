@@ -1,7 +1,7 @@
-package com.teaphy.testzxing.photos.ui
+package com.rrs.afcs.photos.ui
 
-import com.teaphy.testzxing.photos.config.PictureConfig
-import com.teaphy.testzxing.photos.entity.LocalMedia
+import com.rrs.afcs.photos.config.PictureConfig
+import com.rrs.afcs.photos.entity.LocalMedia
 
 /**
  * @desc 选择图片 - 从本地Media数据库读取图片列表

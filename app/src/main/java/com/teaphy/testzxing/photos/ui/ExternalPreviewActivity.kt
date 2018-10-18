@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.ui
+package com.rrs.afcs.photos.ui
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -7,8 +7,9 @@ import android.widget.LinearLayout
 import android.widget.SimpleCursorAdapter
 import android.widget.TextView
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.config.PictureConfig
-import com.teaphy.testzxing.photos.entity.LocalMedia
+import com.rrs.afcs.photos.config.PictureConfig
+import com.rrs.afcs.photos.entity.LocalMedia
+import com.rrs.afcs.photos.immersive.ImmeriveUtils
 
 class ExternalPreviewActivity : AppCompatActivity() {
 
@@ -22,6 +23,7 @@ class ExternalPreviewActivity : AppCompatActivity() {
 	private var indexPreview: Int = 0
 
 	override fun onCreate(savedInstanceState: Bundle?) {
+		ImmeriveUtils.immersive(this, android.R.color.transparent, android.R.color.transparent)
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_external_preview)
 

@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.widget
+package com.rrs.afcs.photos.widget
 
 import android.annotation.TargetApi
 import android.content.Context

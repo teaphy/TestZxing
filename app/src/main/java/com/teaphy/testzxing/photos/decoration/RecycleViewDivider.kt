@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.decoration
+package com.rrs.afcs.photos.decoration
 
 import android.content.Context
 import android.graphics.Canvas

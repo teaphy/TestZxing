@@ -1,8 +1,8 @@
-package com.teaphy.testzxing.photos.config
+package com.rrs.afcs.photos.config
 
-import com.teaphy.testzxing.photos.entity.LocalMedia
-import com.teaphy.testzxing.photos.loader.ILocalMediaLoadListener
-import com.teaphy.testzxing.photos.loader.IMediaSelectListener
+import com.rrs.afcs.photos.entity.LocalMedia
+import com.rrs.afcs.photos.loader.ILocalMediaLoadListener
+import com.rrs.afcs.photos.loader.IMediaSelectListener
 import kotlin.math.min
 
 /**
@@ -22,11 +22,8 @@ class PictureSelectConfig private constructor() {
 	// 拍照后，图片的保存路径
 	var outputCameraPath: String = ""
 
-	// 已选择的图片
-	var selectMedias: MutableList<LocalMedia>?= null
-
 	// 图片选择的模式
-	var selectModel: SelectModel = SelectModel.SINGLE
+	var selectModel: SelectModel = SelectModel.MULTIPLE
 
 	var localMediaLoaderListener: IMediaSelectListener? = null
 
@@ -67,7 +64,6 @@ class PictureSelectConfig private constructor() {
 		minSelectNumber = 0
 		isCamera = true
 		outputCameraPath = ""
-		selectMedias = null
 		localMediaLoaderListener = null
 	}
 }

@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.ui
+package com.rrs.afcs.photos.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -11,7 +11,7 @@ import android.support.v7.widget.RecyclerView
 import android.widget.Button
 import android.widget.TextView
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.entity.LocalMedia
+import com.rrs.afcs.photos.entity.LocalMedia
 import android.support.v7.widget.SimpleItemAnimator
 import android.text.TextUtils
 import android.view.View
@@ -21,12 +21,12 @@ import com.rrs.afcs.permissions.IGrantedSuccess
 import com.rrs.afcs.permissions.RxPermissionUtil
 import com.rrs.afcs.view.IItemCallback
 import com.tbruyelle.rxpermissions2.RxPermissions
-import com.teaphy.testzxing.photos.config.PictureConfig
-import com.teaphy.testzxing.photos.config.PictureSelectConfig
-import com.teaphy.testzxing.photos.constant.PictureTypeConstant
-import com.teaphy.testzxing.photos.decoration.GridSpacingItemDecoration
-import com.teaphy.testzxing.photos.listener.ISelectChangeListener
-import com.teaphy.testzxing.photos.observe.CancelSubject
+import com.rrs.afcs.photos.config.PictureConfig
+import com.rrs.afcs.photos.config.PictureSelectConfig
+import com.rrs.afcs.photos.constant.PictureTypeConstant
+import com.rrs.afcs.photos.decoration.GridSpacingItemDecoration
+import com.rrs.afcs.photos.listener.ISelectChangeListener
+import com.rrs.afcs.photos.observe.CancelSubject
 import java.io.File
 import java.io.IOException
 import java.util.ArrayList
@@ -34,11 +34,13 @@ import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Handler
-import com.teaphy.testzxing.photos.loader.ITakePhotoListener
-import com.teaphy.testzxing.photos.loader.LocalMediaLoader
+import android.support.constraint.ConstraintLayout
+import com.rrs.afcs.photos.loader.ITakePhotoListener
+import com.rrs.afcs.photos.loader.LocalMediaLoader
 import com.umeng.socialize.utils.DeviceConfig.context
 import android.support.v4.content.FileProvider
-import com.teaphy.testzxing.photos.config.PictureMimeType
+import com.blankj.utilcode.util.SizeUtils
+import com.rrs.afcs.photos.config.PictureMimeType
 
 
 /**
@@ -51,6 +53,7 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 	protected lateinit var selectButton: Button
 	private lateinit var cancelText: TextView
 	private lateinit var recyclerView: RecyclerView
+	private lateinit var bottomLayout: ConstraintLayout
 
 	val listLocalMedia = mutableListOf<LocalMedia>()
 
@@ -64,9 +67,25 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 
 		initView()
 
+		initPreAndSelView()
+
 		setListener()
 
-		loadLocalImage()
+		RxPermissionUtil.getInstance(this)
+				.requestCamera(object : IGrantedSuccess{
+					override fun onGrantedSuccess() {
+						loadLocalImage()
+					}
+
+				},object : IGrantedFailure{
+					override fun onGrantedFailure() {
+						Toast.makeText(this@BasePhotoSelectorActivity,
+								R.string.camera_permission,
+								Toast.LENGTH_SHORT).show()
+					}
+
+				})
+
 	}
 
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -89,13 +108,14 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 	private fun initView() {
 		backText = findViewById(R.id.backText)
 		cancelText = findViewById(R.id.cancelText)
-		previewText = findViewById(R.id.previewText)
-		selectButton = findViewById(R.id.selectButton)
 		recyclerView = findViewById(R.id.recyclerView)
 
 		with(recyclerView) {
 			val manager = GridLayoutManager(this@BasePhotoSelectorActivity, 3)
-			addItemDecoration(GridSpacingItemDecoration(3, 16, true))
+			addItemDecoration(GridSpacingItemDecoration(3,
+					SizeUtils.dp2px(6f),
+					true,
+					SizeUtils.dp2px(64f)))
 			layoutManager = manager
 			// 解决调用 notifyItemChanged 闪烁问题,取消默认动画
 			(itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
@@ -104,36 +124,50 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 		}
 	}
 
+	/**
+	 * 初始化 预览和选择按钮
+	 */
+	private fun initPreAndSelView() {
+		// 单选模式
+		if (PictureSelectConfig.getInstance().selectModel == PictureSelectConfig.SelectModel.SINGLE) {
+			bottomLayout = findViewById(R.id.bottomLayout)
+
+			bottomLayout.visibility = View.GONE
+		} else { // 多选模式
+			bottomLayout = findViewById(R.id.bottomLayout)
+
+			bottomLayout.visibility = View.VISIBLE
+			previewText = findViewById(R.id.previewText)
+			selectButton = findViewById(R.id.selectButton)
+
+
+			previewText.setOnClickListener {
+				openPreviewMediaActivity()
+			}
+
+			selectButton.setOnClickListener {
+				forSelectResult()
+			}
+		}
+	}
+
+
 	open fun setListener() {
 
 		/**
 		 * 当选择图片列表发生变化时的回调
 		 */
 		photosAdapter.selectChangeListener = object : ISelectChangeListener {
-			override fun onSelectChange() {
-				val countSelect = photosAdapter.listSelected.size
-				val isSelected = countSelect > 0
-				val preEnable: Boolean = isSelected
-				val preClickable: Boolean = isSelected
-				val preAlpha: Float = if (isSelected) {
-					1.0F
-				} else {
-					0.5F
+			override fun onSelectChange(localMedia: LocalMedia) {
+
+				// 单选模式
+				if (PictureSelectConfig.getInstance().selectModel == PictureSelectConfig.SelectModel.SINGLE) {
+					forSelectResult()
+				} else { // 多选模式
+					updatePreAndSelUI()
 				}
 
-				val selectDesc = if (countSelect > 0) {
-					getString(R.string.photos_select_num, countSelect)
-				} else {
-					getString(R.string.select)
-				}
 
-				with(previewText) {
-					isEnabled = preEnable
-					isClickable = preClickable
-					alpha = preAlpha
-				}
-
-				selectButton.text = selectDesc
 			}
 		}
 
@@ -147,17 +181,9 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 			CancelSubject.obtain().notifyObserver()
 		}
 
-		previewText.setOnClickListener {
-			openPreviewMediaActivity()
-		}
-
-		selectButton.setOnClickListener {
-			forSelectResult()
-		}
 
 		photosAdapter.cameraClickListener = View.OnClickListener { openCamera() }
 	}
-
 
 	/**
 	 * 更新本地图片列表
@@ -274,7 +300,7 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 
 		photosAdapter.updateData(listLocalMedia)
 
-
+		updatePreAndSelUI()
 	}
 
 	private fun openPreviewAllActivity(item: LocalMedia) {
@@ -359,6 +385,43 @@ abstract class BasePhotoSelectorActivity : BasePhotosActivity() {
 		val contentUri = Uri.fromFile(f)
 		mediaScanIntent.data = contentUri
 		this.sendBroadcast(mediaScanIntent)
+	}
+
+
+	/**
+	 * 更新预览和选择 按钮
+	 */
+	private fun updatePreAndSelUI() {
+		val countSelect = photosAdapter.listSelected.size
+		val isSelected = countSelect > 0
+		val preEnable: Boolean = isSelected
+		val preClickable: Boolean = isSelected
+		val preAlpha: Float = if (isSelected) {
+			1.0F
+		} else {
+			0.5F
+		}
+
+		val selectDesc = if (countSelect > 0) {
+			getString(R.string.photos_select_num, countSelect)
+		} else {
+			getString(R.string.select)
+		}
+
+		with(previewText) {
+			isEnabled = preEnable
+			isClickable = preClickable
+			alpha = preAlpha
+		}
+
+		with(selectButton) {
+			isEnabled = preEnable
+			isClickable = preClickable
+			alpha = preAlpha
+		}
+
+
+		selectButton.text = selectDesc
 	}
 
 	abstract fun loadLocalImage()

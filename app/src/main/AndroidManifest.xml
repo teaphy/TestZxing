@@ -60,29 +60,28 @@
 			android:name=".test.CaptureTestActivity"
 			android:screenOrientation="portrait"
 			android:stateNotNeeded="true"
-			android:theme="@style/CaptureTheme"
 			android:windowSoftInputMode="stateAlwaysHidden">
 		</activity>
 		<activity android:name=".test.PhotosTestActivity">
 		</activity>
 		<activity
-			android:name=".photos.ui.PhotoSelectActivity"
+			android:name="com.rrs.afcs.photos.ui.PhotoSelectActivity"
 			android:screenOrientation="portrait">
 		</activity>
 		<activity
-			android:name=".photos.ui.PhotoFoldersActivity"
+			android:name="com.rrs.afcs.photos.ui.PhotoFoldersActivity"
 			android:screenOrientation="portrait"/>
 		<activity
-			android:name=".photos.ui.PhotosSelectByFolderActivity"
+			android:name="com.rrs.afcs.photos.ui.PhotosSelectByFolderActivity"
 			android:screenOrientation="portrait"/>
 		<activity
-			android:name=".photos.ui.PreviewMediaActivity"
+			android:name="com.rrs.afcs.photos.ui.PreviewMediaActivity"
 			android:screenOrientation="portrait"/>
 		<activity
-			android:name=".photos.ui.PreviewAllActivity"
+			android:name="com.rrs.afcs.photos.ui.PreviewAllActivity"
 			android:screenOrientation="portrait"/>
-		<activity android:name=".photos.ui.ExternalPreviewActivity">
-		</activity>
+		<activity android:name="com.rrs.afcs.photos.ui.ExternalPreviewActivity"
+			android:screenOrientation="portrait"/>
 
 	</application>
 

@@ -1,12 +1,12 @@
-package com.teaphy.testzxing.photos
+package com.rrs.afcs.photos
 
 import android.content.Intent
-import com.teaphy.testzxing.photos.config.PictureSelectConfig
-import com.teaphy.testzxing.photos.entity.LocalMedia
-import com.teaphy.testzxing.photos.loader.ILocalMediaLoadListener
-import com.teaphy.testzxing.photos.loader.IMediaSelectListener
-import com.teaphy.testzxing.photos.ui.PhotoSelectActivity
-import com.teaphy.testzxing.photos.utils.DoubleUtils
+import com.rrs.afcs.photos.config.PictureSelectConfig
+import com.rrs.afcs.photos.entity.LocalMedia
+import com.rrs.afcs.photos.loader.ILocalMediaLoadListener
+import com.rrs.afcs.photos.loader.IMediaSelectListener
+import com.rrs.afcs.photos.ui.PhotoSelectActivity
+import com.rrs.afcs.photos.utils.DoubleUtils
 
 /**
  * @desc
@@ -23,55 +23,42 @@ class PictureSelectorModel(val pictureSelectors: PictureSelectors) {
 	/**
 	 * 设置最多选择图片数量
 	 */
-	fun maxSelectNumber(maxNum: Int): PictureSelectConfig {
+	fun maxSelectNumber(maxNum: Int): PictureSelectorModel {
 		pictureSelectConfig.maxSelectNumber = maxNum
-		return pictureSelectConfig
+		return this
 	}
 
 	/**
 	 * 设置最少选择图片的数量
 	 */
-	fun minSelectNumber(minNum: Int): PictureSelectConfig {
+	fun minSelectNumber(minNum: Int): PictureSelectorModel {
 		pictureSelectConfig.minSelectNumber = minNum
-		return  pictureSelectConfig
+		return  this
 	}
 
 	/**
 	 * 设置在图片选择列表中是否显示拍照图标
 	 */
-	fun isCamera(isCamera: Boolean): PictureSelectConfig {
+	fun isCamera(isCamera: Boolean): PictureSelectorModel {
 		pictureSelectConfig.isCamera = isCamera
-		return  pictureSelectConfig
+		return  this
 	}
 
 	/**
 	 * 设置拍照后图片的保存路径
 	 */
-	fun outputCameraPath(path: String): PictureSelectConfig {
+	fun outputCameraPath(path: String): PictureSelectorModel {
 		pictureSelectConfig.outputCameraPath = path
-		return  pictureSelectConfig
+		return  this
 	}
 
-	/**
-	 * 已选择的图片列表
-	 */
-	fun selectMedias(list: List<LocalMedia>): PictureSelectConfig {
-		if (null == pictureSelectConfig.selectMedias) {
-			pictureSelectConfig.selectMedias = mutableListOf()
-		} else {
-			pictureSelectConfig.selectMedias!!.clear()
-		}
-
-		pictureSelectConfig.selectMedias!!.addAll(list)
-		return  pictureSelectConfig
-	}
 
 	/**
 	 * 图片选择的模式
 	 */
-	fun selectModel(model: PictureSelectConfig.SelectModel): PictureSelectConfig {
+	fun selectModel(model: PictureSelectConfig.SelectModel): PictureSelectorModel {
 		pictureSelectConfig.selectModel = model
-		return  pictureSelectConfig
+		return  this
 	}
 
 	/**

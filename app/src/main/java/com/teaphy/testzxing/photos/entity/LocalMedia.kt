@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.entity
+package com.rrs.afcs.photos.entity
 
 import android.os.Parcel
 import android.os.Parcelable

@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.entity
+package com.rrs.afcs.photos.entity
 
 /**
  * @desc 图片文件夹列表

@@ -5,9 +5,9 @@
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	tools:context=".photos.ui.PreviewMediaActivity">
+	tools:context="com.rrs.afcs.photos.ui.PreviewMediaActivity">
 
-	<com.teaphy.testzxing.photos.widget.CustomViewPager
+	<com.rrs.afcs.photos.widget.CustomViewPager
 		android:id="@+id/mediaViewPager"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
@@ -17,12 +17,13 @@
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent">
 
-	</com.teaphy.testzxing.photos.widget.CustomViewPager>
+	</com.rrs.afcs.photos.widget.CustomViewPager>
 
 	<android.support.constraint.ConstraintLayout
 		android:id="@+id/titleLayout"
 		android:layout_width="0dp"
-		android:layout_height="48dp"
+		android:layout_height="64dp"
+		android:paddingTop="18dp"
 		android:background="@color/background_trans"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"

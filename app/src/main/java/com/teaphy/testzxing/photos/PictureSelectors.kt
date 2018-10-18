@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos
+package com.rrs.afcs.photos
 
 import android.app.Activity
 import android.content.Context
@@ -7,10 +7,10 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.app.BundleCompat
 import android.support.v4.app.Fragment
-import com.teaphy.testzxing.photos.config.PictureConfig
-import com.teaphy.testzxing.photos.config.PictureSelectConfig
-import com.teaphy.testzxing.photos.entity.LocalMedia
-import com.teaphy.testzxing.photos.ui.ExternalPreviewActivity
+import com.rrs.afcs.photos.config.PictureConfig
+import com.rrs.afcs.photos.config.PictureSelectConfig
+import com.rrs.afcs.photos.entity.LocalMedia
+import com.rrs.afcs.photos.ui.ExternalPreviewActivity
 import java.lang.ref.WeakReference
 import java.util.ArrayList
 

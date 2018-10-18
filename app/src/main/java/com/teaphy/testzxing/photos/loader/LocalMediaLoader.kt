@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.loader
+package com.rrs.afcs.photos.loader
 
 import android.database.Cursor
 import android.net.Uri
@@ -10,12 +10,13 @@ import android.support.v4.app.FragmentActivity
 import android.support.v4.app.LoaderManager
 import android.support.v4.content.CursorLoader
 import android.support.v4.content.Loader
-import com.teaphy.testzxing.photos.entity.LocalMedia
+import com.rrs.afcs.photos.entity.LocalMedia
 import timber.log.Timber
 import android.text.TextUtils
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.config.PictureConfig
-import com.teaphy.testzxing.photos.entity.LocalMediaFolder
+import com.rrs.afcs.photos.config.PictureConfig
+import com.rrs.afcs.photos.config.PictureMimeType
+import com.rrs.afcs.photos.entity.LocalMediaFolder
 import java.io.File
 import java.util.*
 
@@ -113,6 +114,14 @@ class LocalMediaLoader(private val activity: FragmentActivity, private val isGif
 									val width = data.getInt(data.getColumnIndexOrThrow(PROJECTION[4]))
 									val height = data.getInt(data.getColumnIndexOrThrow(PROJECTION[5]))
 									val lastModify = data.getLong(data.getColumnIndexOrThrow(PROJECTION[6]))
+
+									val suff = name.substringAfterLast(".")
+
+
+									// 判断当前Picture是否为Android支持的图片格式
+									if (!PictureMimeType.isImageType(suff)) {
+										continue
+									}
 
 									val image = LocalMedia(path, name, pictureType, width, height, lastModify)
 

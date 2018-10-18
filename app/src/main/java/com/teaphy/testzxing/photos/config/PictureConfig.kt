@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.config
+package com.rrs.afcs.photos.config
 
 /**
  * @desc

@@ -1,9 +1,9 @@
-package com.teaphy.testzxing.photos.ui
+package com.rrs.afcs.photos.ui
 
 import android.widget.Toast
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.config.PictureSelectConfig
-import com.teaphy.testzxing.photos.entity.LocalMedia
+import com.rrs.afcs.photos.config.PictureSelectConfig
+import com.rrs.afcs.photos.entity.LocalMedia
 
 
 class PreviewAllActivity : BasePreviewMediaActivity() {
@@ -15,11 +15,24 @@ class PreviewAllActivity : BasePreviewMediaActivity() {
 		numText.setOnClickListener {
 			val position = mediaViewPager.currentItem
 
-			// 更新当前LocalMedia的状态
-			updateSelectStatus(position)
+			if (PictureSelectConfig.getInstance().selectModel == PictureSelectConfig.SelectModel.SINGLE) {
+				val localMedia = listImage[position]
 
-			// 更新选择数量相关的UI
-			updateNumberChangeUI()
+				// 更新LocalMedia的选中状态
+				localMedia.isChecked = true
+				listImage[position] = localMedia
+				listImageSelected.clear()
+				listImageSelected.add(localMedia)
+
+				forSelectResult()
+			} else {
+				// 更新当前LocalMedia的状态
+				updateSelectStatus(position)
+
+				// 更新选择数量相关的UI
+				updateNumberChangeUI()
+			}
+
 		}
 	}
 

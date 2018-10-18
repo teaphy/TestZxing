@@ -1,6 +1,7 @@
 package com.teaphy.testzxing
 
 import android.app.Application
+import com.blankj.utilcode.util.Utils
 import com.rrs.afcs.base.BaseApplication
 import timber.log.Timber
 
@@ -15,6 +16,8 @@ class App: Application() {
 		super.onCreate()
 
 		Timber.plant(Timber.DebugTree())
+
+		Utils.init(this)
 	}
 
 }

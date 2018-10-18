@@ -1,4 +1,6 @@
-package com.teaphy.testzxing.photos.listener
+package com.rrs.afcs.photos.listener
+
+import com.rrs.afcs.photos.entity.LocalMedia
 
 /**
  * @desc
@@ -7,5 +9,5 @@ package com.teaphy.testzxing.photos.listener
  */
 @FunctionalInterface
 interface ISelectChangeListener {
-	fun onSelectChange()
+	fun onSelectChange(localMedia: LocalMedia)
 }

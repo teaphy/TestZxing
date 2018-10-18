@@ -1,9 +1,9 @@
-package com.teaphy.testzxing.photos.ui
+package com.rrs.afcs.photos.ui
 
 import android.widget.Toast
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.config.PictureSelectConfig
-import com.teaphy.testzxing.photos.entity.LocalMedia
+import com.rrs.afcs.photos.config.PictureSelectConfig
+import com.rrs.afcs.photos.entity.LocalMedia
 
 
 class PreviewMediaActivity : BasePreviewMediaActivity() {

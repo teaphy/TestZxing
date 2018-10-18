@@ -6,13 +6,12 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:background="@android:color/white"
-	tools:context=".photos.ui.PhotoFoldersActivity">
+	tools:context="com.rrs.afcs.photos.ui.PhotoFoldersActivity">
 
 	<android.support.v7.widget.RecyclerView
 		android:id="@+id/recyclerView"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:paddingTop="48dp"
 		app:layout_constraintBottom_toBottomOf="parent"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +22,8 @@
 	<android.support.constraint.ConstraintLayout
 		android:id="@+id/titleLayout"
 		android:layout_width="match_parent"
-		android:layout_height="48dp"
+		android:layout_height="64dp"
+		android:paddingTop="18dp"
 		android:background="@color/background_trans"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"

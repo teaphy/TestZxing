@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.config
+package com.rrs.afcs.photos.config
 
 import android.text.TextUtils
 import java.io.File
@@ -11,6 +11,10 @@ import java.io.File
  */
 class PictureMimeType {
 	companion object {
+
+		/**
+		 * 获取图片类型
+		 */
 		fun createImageType(path: String): String {
 			try {
 				if (!TextUtils.isEmpty(path)) {
@@ -25,6 +29,27 @@ class PictureMimeType {
 				return "image/jpeg"
 			}
 			return "image/jpeg"
+		}
+
+		/**
+		 * 是否为Android支持的图片格式
+		 */
+		fun isImageType(pictureType: String): Boolean {
+			return when (pictureType.toLowerCase()) {
+				"png",
+				"PNG",
+				"jpeg",
+				"JPEG",
+				"webp",
+				"WEBP",
+				"gif",
+				"GIF",
+				"bmp",
+				"BMP",
+				"jpg",
+				"JPG" -> true
+				else -> false
+			}
 		}
 	}
 

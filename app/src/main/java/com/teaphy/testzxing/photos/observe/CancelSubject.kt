@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.observe
+package com.rrs.afcs.photos.observe
 
 /**
  * @desc

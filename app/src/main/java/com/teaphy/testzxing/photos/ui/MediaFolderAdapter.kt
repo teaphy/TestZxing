@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.ui
+package com.rrs.afcs.photos.ui
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
@@ -10,7 +10,7 @@ import android.widget.TextView
 import com.rrs.afcs.picture.PictureHelper
 import com.rrs.afcs.view.IItemCallback
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.entity.LocalMediaFolder
+import com.rrs.afcs.photos.entity.LocalMediaFolder
 
 /**
  * @desc

@@ -1,6 +1,6 @@
-package com.teaphy.testzxing.photos.loader
+package com.rrs.afcs.photos.loader
 
-import com.teaphy.testzxing.photos.entity.LocalMedia
+import com.rrs.afcs.photos.entity.LocalMedia
 
 /**
  * @desc

@@ -1,18 +1,20 @@
-package com.teaphy.testzxing.photos.ui
+package com.rrs.afcs.photos.ui
 
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.widget.TextView
+import com.blankj.utilcode.util.SizeUtils
 import com.rrs.afcs.view.IItemCallback
 import com.teaphy.testzxing.R
-import com.teaphy.testzxing.photos.config.PictureConfig
-import com.teaphy.testzxing.photos.entity.LocalMedia
-import com.teaphy.testzxing.photos.entity.LocalMediaFolder
-import com.teaphy.testzxing.photos.loader.ILocalMediaLoadListener
-import com.teaphy.testzxing.photos.loader.LocalMediaLoader
-import com.teaphy.testzxing.photos.observe.CancelSubject
+import com.rrs.afcs.photos.config.PictureConfig
+import com.rrs.afcs.photos.decoration.SpacesItemDecoration
+import com.rrs.afcs.photos.entity.LocalMedia
+import com.rrs.afcs.photos.entity.LocalMediaFolder
+import com.rrs.afcs.photos.loader.ILocalMediaLoadListener
+import com.rrs.afcs.photos.loader.LocalMediaLoader
+import com.rrs.afcs.photos.observe.CancelSubject
 import java.util.ArrayList
 
 class PhotoFoldersActivity : BasePhotosActivity() {
@@ -41,6 +43,7 @@ class PhotoFoldersActivity : BasePhotosActivity() {
 		with(recyclerView) {
 			layoutManager = LinearLayoutManager(this@PhotoFoldersActivity, LinearLayoutManager.VERTICAL, false)
 			setHasFixedSize(true)
+			addItemDecoration(SpacesItemDecoration(SizeUtils.dp2px(0f), SizeUtils.dp2px(64f)))
 			adapter = folderAdapter
 		}
 	}

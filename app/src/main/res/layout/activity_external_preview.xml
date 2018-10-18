@@ -1,18 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:orientation="vertical"
-	tools:context=".photos.ui.ExternalPreviewActivity">
+	tools:context="com.rrs.afcs.photos.ui.ExternalPreviewActivity">
+
+	<android.support.v4.view.ViewPager
+		android:id="@+id/preview_view_pager"
+		android:fitsSystemWindows="true"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+	</android.support.v4.view.ViewPager>
 
 	<LinearLayout
 		android:layout_width="match_parent"
-		android:layout_height="48dp"
+		android:fitsSystemWindows="true"
+		android:layout_height="64dp"
+		android:paddingTop="18dp"
+		android:layout_gravity="top"
 		android:orientation="horizontal"
-		android:background="@color/contents_text">
+		android:background="@color/background_trans">
 
 		<LinearLayout
 			android:id="@+id/back_layout"
@@ -37,11 +47,4 @@
 				android:textColor="@android:color/white"/>
 		</LinearLayout>
 	</LinearLayout>
-
-	<android.support.v4.view.ViewPager
-		android:id="@+id/preview_view_pager"
-		android:layout_width="match_parent"
-		android:layout_height="match_parent">
-
-	</android.support.v4.view.ViewPager>
-</LinearLayout>
+</FrameLayout>

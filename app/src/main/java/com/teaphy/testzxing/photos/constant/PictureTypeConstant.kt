@@ -1,4 +1,4 @@
-package com.teaphy.testzxing.photos.constant
+package com.rrs.afcs.photos.constant
 
 /**
  * @desc

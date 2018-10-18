@@ -1,10 +1,16 @@
-package com.teaphy.testzxing.photos.ui
+package com.rrs.afcs.photos.ui
 
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
-import com.teaphy.testzxing.photos.observe.CancelSubject
-import com.teaphy.testzxing.photos.observe.ICancelObserve
+import android.view.View
+import android.view.WindowManager
+import com.rrs.afcs.photos.immersive.ImmeriveUtils
+import com.rrs.afcs.photos.observe.CancelSubject
+import com.rrs.afcs.photos.observe.ICancelObserve
+
 
 /**
  * @desc
@@ -13,7 +19,10 @@ import com.teaphy.testzxing.photos.observe.ICancelObserve
  */
 abstract class BasePhotosActivity : AppCompatActivity(), ICancelObserve {
 
+	protected var openWhiteStatusBar: Boolean = false
+
 	override fun onCreate(savedInstanceState: Bundle?) {
+		immersive()
 		super.onCreate(savedInstanceState)
 		CancelSubject.obtain().subcribeObserve(this)
 	}
@@ -25,5 +34,13 @@ abstract class BasePhotosActivity : AppCompatActivity(), ICancelObserve {
 
 	override fun doCancel() {
 		finish()
+	}
+
+
+	/**
+	 * 具体沉浸的样式，可以根据需要自行修改状态栏和导航栏的颜色
+	 */
+	fun immersive() {
+		ImmeriveUtils.immersive(this, android.R.color.transparent, android.R.color.transparent)
 	}
 }
